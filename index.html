@@ -1,0 +1,1810 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" id="theme-color-meta" content="#0f0f12">
+<title>Peak Physiq</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root {
+  --acc:#f5d800; --acc-dk:#c9b200; --acc-txt:#0f0e00;
+  --r:clamp(8px,1.5vw,14px); --nav-h:60px;
+  --safe:env(safe-area-inset-bottom,0px);
+  --font:'Plus Jakarta Sans',sans-serif;
+  --head:'Syne',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --tr:0.18s cubic-bezier(0.4,0,0.2,1);
+}
+[data-theme="dark"]{
+  --bg:#0f0f12; --surface:#17171c; --surface2:#1e1e25; --surface3:#25252e;
+  --border:#2a2a35; --text:#e8e8f0; --text2:#9090a8;
+  --danger:#f04444; --good:#34c85a;
+  --sh:0 2px 8px rgba(0,0,0,.4),0 0 0 1px var(--border);
+  --cg:#2a2a35; --ct:#9090a8;
+}
+[data-theme="light"]{
+  --bg:#f5f5f0; --surface:#ffffff; --surface2:#eeeeea; --surface3:#e6e6e0;
+  --border:#ddddd5; --text:#111118; --text2:#6a6a78;
+  --danger:#d93535; --good:#1d8a3c;
+  --sh:0 1px 4px rgba(0,0,0,.07),0 0 0 1px var(--border);
+  --cg:#e0e0d8; --ct:#7a7a88;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:clamp(13px,1.5vw,16px);scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background var(--tr),color var(--tr)}
+
+/* ══ HEADINGS ══ */
+.pt,.hw-title,.mod-title{font-family:var(--head)}
+
+/* ══ LAYOUT ══ */
+.shell{display:flex;min-height:100vh}
+.sidebar{display:none;width:clamp(180px,15vw,220px);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:clamp(1rem,2vh,1.75rem) 0;position:sticky;top:0;height:100vh;flex-direction:column;overflow-y:auto;z-index:50;transition:background var(--tr),border-color var(--tr)}
+.logo{padding:0 clamp(.8rem,1.5vw,1.25rem) clamp(1rem,2vh,1.75rem);font-family:var(--head);font-size:clamp(.9rem,1.2vw,1.05rem);font-weight:800;letter-spacing:-.02em;color:var(--acc);display:flex;align-items:center;gap:.4rem}
+.logo-sub{color:var(--text);font-weight:700}
+.sidenav{display:flex;flex-direction:column;gap:2px;padding:0 .5rem;flex:1}
+.nav-btn{display:flex;align-items:center;gap:.6rem;padding:.58rem .7rem;border-radius:calc(var(--r) - 2px);border:none;background:transparent;color:var(--text2);font-family:var(--font);font-size:.78rem;font-weight:600;cursor:pointer;transition:all var(--tr);text-align:left;width:100%;letter-spacing:.01em}
+.nav-btn:hover{background:var(--surface2);color:var(--text)}
+.nav-btn.active{background:var(--acc);color:var(--acc-txt)}
+.nav-btn .ic{font-size:.9rem;width:16px;text-align:center;flex-shrink:0}
+.sidebar-footer{padding:.75rem .5rem;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:.4rem}
+.content{flex:1;padding:clamp(1rem,3vw,2rem) clamp(.75rem,3vw,1.75rem);padding-bottom:calc(var(--nav-h) + var(--safe) + 1rem);min-width:0}
+.content-inner{max-width:min(860px,100%);margin:0 auto}
+
+/* ══ BOTTOM NAV ══ */
+.bnav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav-h) + var(--safe));padding-bottom:var(--safe);background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;z-index:100;transition:background var(--tr),border-color var(--tr);backdrop-filter:blur(12px)}
+.bnav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:transparent;color:var(--text2);font-family:var(--font);font-size:.46rem;font-weight:600;cursor:pointer;padding:.3rem clamp(.2rem,.5vw,.4rem);border-radius:8px;transition:all var(--tr);text-transform:uppercase;letter-spacing:.07em;min-width:44px}
+.bnav-btn .ic{font-size:1.1rem}
+.bnav-btn.active{color:var(--acc)}
+
+/* ══ VIEWS ══ */
+.view{display:none;animation:fadeIn .2s ease}.view.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ PAGE HEADER ══ */
+.ph{margin-bottom:clamp(.75rem,2vh,1.25rem)}
+.pt{font-size:clamp(1rem,2.5vw,1.3rem);font-weight:800;letter-spacing:-.025em;line-height:1.1}
+.ps{color:var(--text2);font-size:.68rem;margin-top:.2rem;font-family:var(--mono)}
+
+/* ══ CARDS ══ */
+.card{background:var(--surface);box-shadow:var(--sh);border-radius:var(--r);padding:clamp(.85rem,2vw,1.25rem);transition:background var(--tr),box-shadow var(--tr)}
+.gap{margin-bottom:clamp(.5rem,1.5vh,.85rem)}
+
+/* ══ STATS ══ */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(clamp(120px,20vw,160px),1fr));gap:clamp(.4rem,1vw,.65rem);margin-bottom:clamp(.5rem,1.5vh,.85rem)}
+.sc{background:var(--surface);box-shadow:var(--sh);border-radius:var(--r);padding:.85rem .9rem;transition:background var(--tr)}
+.sl{font-size:.55rem;text-transform:uppercase;letter-spacing:.12em;color:var(--text2);font-family:var(--mono);margin-bottom:.2rem}
+.sv{font-size:.9rem;font-weight:700;font-family:var(--mono);color:var(--text)}
+.ss{font-size:.6rem;color:var(--text2);font-family:var(--mono);margin-top:.15rem;line-height:1.3}
+.dg{color:var(--good)}.db{color:var(--danger)}.dn{color:var(--text2)}
+
+/* ══ SUMMARY BAR ══ */
+.sumbar{background:var(--surface);box-shadow:var(--sh);border-radius:var(--r);padding:clamp(.75rem,2vw,1rem);margin-bottom:clamp(.5rem,1.5vh,.85rem);transition:background var(--tr)}
+.sumbar-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;flex-wrap:wrap;gap:.4rem}
+.sum-lbl{font-size:.57rem;text-transform:uppercase;letter-spacing:.12em;color:var(--text2);font-family:var(--mono)}
+.mets{display:grid;grid-template-columns:repeat(3,1fr);gap:.35rem .5rem;margin-bottom:.65rem}
+@media(min-width:500px){.mets{grid-template-columns:repeat(6,1fr)}}
+.met{text-align:center;background:var(--surface2);border-radius:calc(var(--r) - 4px);padding:.45rem .3rem}
+.met-v{font-size:.78rem;font-weight:700;font-family:var(--mono);color:var(--text)}
+.met-l{font-size:.49rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);font-family:var(--mono);margin-top:2px}
+.pb-wrap{background:var(--surface2);border-radius:3px;height:4px;overflow:hidden}
+.pb-fill{height:100%;border-radius:3px;background:var(--acc);transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+/* ══ PERIOD SELECTOR ══ */
+.psel{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;margin-bottom:clamp(.6rem,1.5vh,.9rem)}
+.ptog{display:flex;background:var(--surface2);border-radius:calc(var(--r) - 2px);padding:2px;border:1px solid var(--border)}
+.pb-{padding:.26rem .65rem;border-radius:calc(var(--r) - 4px);border:none;background:transparent;color:var(--text2);font-family:var(--font);font-size:.72rem;font-weight:600;cursor:pointer;transition:all var(--tr)}
+.pb-.on{background:var(--acc);color:var(--acc-txt)}
+.pnav{display:flex;gap:.25rem;align-items:center}
+.pnav-btn{width:28px;height:28px;border-radius:calc(var(--r) - 4px);border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:all var(--tr)}
+.pnav-btn:hover{background:var(--acc);border-color:var(--acc);color:var(--acc-txt)}
+.plbl{font-size:.68rem;font-family:var(--mono);background:var(--surface);border:1px solid var(--border);border-radius:calc(var(--r) - 4px);padding:.24rem .65rem;white-space:nowrap;color:var(--text)}
+
+/* ══ FORMS ══ */
+.fsec{margin-bottom:1rem}
+.ftitle{font-size:.55rem;text-transform:uppercase;letter-spacing:.12em;color:var(--acc-dk);font-family:var(--mono);margin-bottom:.5rem;font-weight:500}
+[data-theme="light"] .ftitle{color:#8a7400}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(120px,20vw,160px),1fr));gap:.55rem}
+.fg{display:flex;flex-direction:column;gap:.28rem}
+.fg.full{grid-column:1/-1}
+label{font-size:.55rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);font-family:var(--mono)}
+input[type=number],input[type=date],input[type=text],select{background:var(--surface2);border:1px solid var(--border);border-radius:calc(var(--r) - 2px);color:var(--text);font-family:var(--mono);font-size:.83rem;padding:.5rem .7rem;width:100%;transition:border-color var(--tr),background var(--tr);-webkit-appearance:none;appearance:none}
+input:focus,select:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 2px rgba(245,216,0,.15)}
+input::placeholder{color:var(--text2)}
+select option{background:var(--surface2);color:var(--text)}
+
+/* ══ BUTTONS ══ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;padding:.5rem 1rem;border-radius:calc(var(--r) - 2px);border:none;font-family:var(--font);font-size:.78rem;font-weight:600;cursor:pointer;transition:all var(--tr);white-space:nowrap}
+.btn-p{background:var(--acc);color:var(--acc-txt)}
+.btn-p:hover{background:#ffe828;transform:translateY(-1px);box-shadow:0 4px 12px rgba(245,216,0,.3)}
+.btn-s{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-s:hover{background:var(--surface2)}
+.btn-d{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+.btn-d:hover{background:rgba(240,68,68,.08)}
+.btn-sm{padding:.26rem .62rem;font-size:.68rem;border-radius:calc(var(--r) - 4px)}
+.btn-full{width:100%}
+
+/* ══ SAVE CONFIRMATION ══ */
+.save-row{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap}
+.save-ok{font-size:.68rem;font-family:var(--mono);color:var(--good);opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
+.save-ok.show{opacity:1}
+
+/* ══ WEEK DEFICIT BAR ══ */
+.wk-def-bar{background:var(--surface2);border:1px solid var(--border);border-radius:calc(var(--r) - 2px);padding:.7rem .85rem;margin-bottom:.6rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.wk-def-info{flex:1;min-width:0}
+.wk-def-lbl{font-size:.55rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);font-family:var(--mono);margin-bottom:.15rem}
+.wk-def-val{font-size:.82rem;font-weight:700;font-family:var(--mono);color:var(--text)}
+.wk-def-src{font-size:.58rem;font-family:var(--mono);color:var(--text2);margin-top:.1rem}
+.wk-def-edit{display:flex;align-items:center;gap:.4rem;flex-shrink:0;flex-wrap:wrap}
+.wk-def-input{width:80px;font-family:var(--mono);font-size:.78rem;padding:.3rem .5rem;background:var(--surface);border:1px solid var(--border);border-radius:calc(var(--r) - 4px);color:var(--text);-webkit-appearance:none}
+.wk-def-input:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 2px rgba(245,216,0,.12)}
+
+/* ══ CALC PREVIEW ══ */
+.cprev{background:rgba(245,216,0,.07);border:1px solid rgba(245,216,0,.2);border-radius:calc(var(--r) - 2px);padding:.75rem;margin-bottom:.8rem}
+
+/* ══ CHARTS ══ */
+.cwrap{background:var(--surface);box-shadow:var(--sh);border-radius:var(--r);padding:clamp(.85rem,2vw,1.25rem);margin-bottom:clamp(.5rem,1.5vh,.85rem);transition:background var(--tr)}
+.ctitle{font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);font-family:var(--mono);margin-bottom:.75rem}
+
+/* ══ TABLE ══ */
+.tbl-wrap{overflow-x:auto;border-radius:var(--r);box-shadow:var(--sh)}
+.tbl{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.7rem;min-width:420px}
+.tbl th{background:var(--surface);padding:.45rem .6rem;text-align:left;color:var(--text2);font-size:.54rem;text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:500}
+.tbl td{padding:.45rem .6rem;border-bottom:1px solid var(--border);background:var(--surface);transition:background var(--tr)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--surface2)}
+.dn-cell{font-family:var(--font);font-weight:700;font-size:.7rem}
+.tr-today td{background:rgba(245,216,0,.06)!important}
+.tr-today td:first-child{border-left:2px solid var(--acc)}
+.comp{color:var(--text2)}
+
+/* ══ TAGS ══ */
+.tag{display:inline-block;padding:.14rem .46rem;border-radius:4px;font-size:.54rem;font-family:var(--mono);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.tg{background:rgba(52,200,90,.12);color:var(--good)}
+.tb{background:rgba(240,68,68,.12);color:var(--danger)}
+.ta{background:rgba(245,216,0,.12);color:var(--acc-dk)}
+[data-theme="light"] .ta{color:#8a7400}
+
+/* ══ HISTORY ══ */
+.hw{background:var(--surface);box-shadow:var(--sh);border-radius:var(--r);margin-bottom:clamp(.4rem,1vh,.65rem);overflow:hidden;transition:background var(--tr)}
+.hw-hd{display:flex;justify-content:space-between;align-items:center;padding:.85rem 1rem;cursor:pointer;transition:background var(--tr);user-select:none}
+.hw-hd:hover{background:var(--surface2)}
+.hw-title{font-size:.82rem;font-weight:800;letter-spacing:-.01em}
+.hw-stats{display:flex;gap:.55rem;font-family:var(--mono);font-size:.64rem;color:var(--text2);align-items:center;flex-wrap:wrap}
+.hw-body{display:none;padding:0 1rem .9rem;border-top:1px solid var(--border);padding-top:.8rem}
+.hw-body.open{display:block}
+
+/* ══ MODALS ══ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .2s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border-radius:calc(var(--r) + 4px);padding:clamp(1rem,3vw,1.5rem);width:100%;max-width:min(420px,calc(100vw - 2rem));box-shadow:0 16px 48px rgba(0,0,0,.3),0 0 0 1px var(--border);transform:translateY(12px) scale(.98);transition:transform .2s,opacity .2s}
+.overlay.open .modal{transform:translateY(0) scale(1)}
+.mod-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.mod-title{font-size:.95rem;font-weight:800;letter-spacing:-.01em}
+.mod-close{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;transition:all var(--tr)}
+.mod-close:hover{background:var(--surface3);color:var(--text)}
+
+/* ══ MONTHLY ══ */
+.mgrid{display:grid;gap:.55rem}
+.mrow{background:var(--surface);box-shadow:var(--sh);border-radius:var(--r);padding:.8rem .9rem;display:grid;grid-template-columns:clamp(75px,10vw,90px) 1fr;gap:.65rem;align-items:start;transition:background var(--tr)}
+.mwn{font-size:.62rem;font-family:var(--mono);color:var(--text2);font-weight:500}
+.mwd{font-size:.58rem;font-family:var(--mono);color:var(--text2);margin-top:2px}
+.mmets{display:flex;flex-wrap:wrap;gap:.3rem .85rem}
+.mmi{display:flex;flex-direction:column}
+.mmv{font-size:.78rem;font-weight:700;font-family:var(--mono)}
+.mml{font-size:.5rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);font-family:var(--mono)}
+
+/* ══ SETTINGS ══ */
+.ssec{background:var(--surface);box-shadow:var(--sh);border-radius:var(--r);padding:clamp(.85rem,2vw,1.25rem);margin-bottom:clamp(.5rem,1.5vh,.85rem);transition:background var(--tr)}
+.stitle{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--acc-dk);margin-bottom:.85rem;font-family:var(--font)}
+[data-theme="light"] .stitle{color:#8a7400}
+.drop-zone{border:2px dashed var(--border);border-radius:var(--r);padding:clamp(1.25rem,3vh,1.75rem);text-align:center;cursor:pointer;transition:all var(--tr)}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--acc);background:rgba(245,216,0,.05)}
+.drop-icon{font-size:2rem;margin-bottom:.4rem}
+.drop-txt{color:var(--text2);font-size:.76rem}
+.notice{background:rgba(245,216,0,.08);border:1px solid rgba(245,216,0,.2);border-radius:calc(var(--r) - 2px);padding:.65rem .8rem;font-size:.74rem;color:var(--text);margin-bottom:.85rem;line-height:1.55}
+.notice strong{color:var(--acc-dk)}
+[data-theme="light"] .notice strong{color:#8a7400}
+
+/* ══ INSTALL BANNER ══ */
+#install-banner{display:none;position:fixed;bottom:calc(var(--nav-h) + var(--safe) + .75rem);left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:calc(var(--r) + 2px);padding:.65rem 1rem;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:150;flex-align:center;gap:.75rem;max-width:min(380px,calc(100vw - 2rem));animation:slideUp .3s cubic-bezier(.4,0,.2,1)}
+#install-banner.show{display:flex}
+@keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.install-txt{font-size:.74rem;color:var(--text);flex:1;line-height:1.3}
+.install-txt strong{font-weight:600}
+
+/* ══ TOAST ══ */
+#toast{position:fixed;bottom:calc(var(--nav-h) + var(--safe) + .8rem);left:50%;transform:translateX(-50%) translateY(14px);background:var(--acc);color:var(--acc-txt);padding:.44rem 1rem;border-radius:999px;font-size:.72rem;font-weight:600;opacity:0;transition:all .28s;pointer-events:none;z-index:999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.25);font-family:var(--font)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ══ EMPTY ══ */
+.empty{text-align:center;padding:clamp(2rem,6vh,3rem) 1rem;color:var(--text2)}
+.empty-ic{font-size:2.5rem;margin-bottom:.75rem}
+.empty-t{font-size:.9rem;font-weight:700;margin-bottom:.4rem;color:var(--text);font-family:var(--head)}
+.empty-s{font-size:.74rem}
+
+/* ══ UTILS ══ */
+.row{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}
+.row-b{display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap}
+.tm{font-family:var(--mono)}
+.tmuted{color:var(--text2);font-size:.74rem;line-height:1.5}
+.gap-sm{margin-bottom:.55rem}
+.gap-md{margin-bottom:.85rem}
+.gap-lg{margin-bottom:1.25rem}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(100px,15vw,130px),1fr));gap:.5rem}
+.info-item .sl{margin-bottom:.18rem}
+.info-item .sv{font-size:.82rem}
+
+/* ══ RESPONSIVE ══ */
+@media(min-width:900px){.sidebar{display:flex}.bnav{display:none}.content{padding-bottom:clamp(1rem,3vw,2rem)}}
+@media(min-width:600px){.mets{grid-template-columns:repeat(6,1fr)}}
+@media(max-width:360px){html{font-size:12px}.mets{grid-template-columns:repeat(3,1fr)}}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="logo">&#9889; <span>Peak <span class="logo-sub">Physiq</span></span></div>
+  <div class="sidenav">
+    <button class="nav-btn active" data-view="dashboard" onclick="go('dashboard')"><span class="ic">&#128202;</span>Dashboard</button>
+    <button class="nav-btn" data-view="weekly"   onclick="go('weekly')"><span class="ic">&#128221;</span>Weekly</button>
+    <button class="nav-btn" data-view="monthly"  onclick="go('monthly')"><span class="ic">&#128467;</span>Monthly</button>
+    <button class="nav-btn" data-view="charts"   onclick="go('charts')"><span class="ic">&#128200;</span>Charts</button>
+    <button class="nav-btn" data-view="history"  onclick="go('history')"><span class="ic">&#128197;</span>History</button>
+    <button class="nav-btn" data-view="settings" onclick="go('settings')"><span class="ic">&#9881;</span>Settings</button>
+  </div>
+  <div class="sidebar-footer">
+    <button class="btn btn-s btn-sm" id="theme-sidebar-btn" onclick="toggleTheme()" style="justify-content:flex-start;gap:.5rem"><span id="theme-icon">&#9728;&#65039;</span><span id="theme-lbl">Light Mode</span></button>
+    <button class="btn btn-s btn-sm" id="sb-install-btn" onclick="installApp()" style="display:none;justify-content:flex-start;gap:.5rem">&#128242; Install App</button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="content">
+<div class="content-inner">
+
+<!-- DASHBOARD -->
+<div class="view active" id="view-dashboard">
+  <div class="ph row-b">
+    <div>
+      <div class="pt">Dashboard</div>
+      <div class="ps" id="dash-date">Loading...</div>
+    </div>
+  </div>
+  <div class="psel">
+    <div class="ptog">
+      <button class="pb- on" id="dp-weekly"  onclick="setDP('weekly')">Weekly</button>
+      <button class="pb-"    id="dp-monthly" onclick="setDP('monthly')">Monthly</button>
+    </div>
+    <div class="pnav">
+      <button class="pnav-btn" onclick="shiftDP(-1)">&#8249;</button>
+      <div class="plbl" id="dp-lbl">—</div>
+      <button class="pnav-btn" onclick="shiftDP(1)">&#8250;</button>
+      <button class="pnav-btn" onclick="resetDP()" title="Today">&#8634;</button>
+    </div>
+  </div>
+  <div class="sumbar">
+    <div class="sumbar-hd">
+      <span class="sum-lbl" id="dp-sum-lbl">—</span>
+      <span class="tag ta" id="dp-tag">—</span>
+    </div>
+    <div class="mets" id="dp-mets"></div>
+    <div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:.54rem;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em">Goal progress</span>
+        <span style="font-size:.54rem;color:var(--text2);font-family:var(--mono)" id="goal-txt">—</span>
+      </div>
+      <div class="pb-wrap"><div class="pb-fill" id="goal-bar" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="sgrid" id="key-stats"></div>
+  <div class="card gap">
+    <div class="row-b gap-sm">
+      <div class="ftitle" style="margin-bottom:0">Today's Entry</div>
+      <span class="tm" style="font-size:.62rem;color:var(--text2)" id="today-lbl">—</span>
+    </div>
+    <div class="fsec">
+      <div class="ftitle">Body Metrics</div>
+      <div class="fgrid">
+        <div class="fg"><label>Weight (kg)</label><input type="number" id="f-weight" step="0.01" placeholder="70.5" oninput="calcPrev()"></div>
+        <div class="fg"><label>Calories</label><input type="number" id="f-calories" step="1" placeholder="1800" oninput="calcPrev()"></div>
+        <div class="fg"><label>Neck (cm)</label><input type="number" id="f-neck" step="0.1" placeholder="38" oninput="calcPrev()"></div>
+        <div class="fg"><label>Waist (cm)</label><input type="number" id="f-waist" step="0.1" placeholder="95" oninput="calcPrev()"></div>
+      </div>
+    </div>
+    <div class="fsec">
+      <div class="ftitle">Activity</div>
+      <div class="fgrid">
+        <div class="fg full"><label>Steps Walked</label><input type="number" id="f-steps" step="1" placeholder="10000"></div>
+      </div>
+    </div>
+    <div id="calc-prev" style="display:none" class="cprev gap-md">
+      <div class="ftitle" style="margin-bottom:.4rem">Live Calculation</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:.5rem">
+        <div><div class="sl">Body Fat %</div><div class="sv" id="calc-bf">—</div></div>
+        <div><div class="sl">vs Maintenance</div><div class="sv" id="calc-def">—</div></div>
+        <div><div class="sl">Target Intake</div><div class="sv" id="calc-target">—</div></div>
+      </div>
+    </div>
+    <button class="btn btn-p btn-full" onclick="saveToday()">Save Entry</button>
+  </div>
+</div>
+
+<!-- WEEKLY -->
+<div class="view" id="view-weekly">
+  <div class="ph row-b">
+    <div><div class="pt">Weekly</div><div class="ps" id="log-lbl">—</div></div>
+    <div class="row">
+      <button class="btn btn-s btn-sm" onclick="shiftLog(-1)">&#8249; Prev</button>
+      <button class="btn btn-s btn-sm" onclick="shiftLog(1)">Next &#8250;</button>
+    </div>
+  </div>
+  <div class="wk-def-bar">
+    <div class="wk-def-info">
+      <div class="wk-def-lbl">This Week's Deficit Target</div>
+      <div class="wk-def-val" id="wk-def-val">—</div>
+      <div class="wk-def-src" id="wk-def-src">—</div>
+    </div>
+    <div class="wk-def-edit">
+      <input type="number" class="wk-def-input" id="wk-def-input" placeholder="kcal" min="0" max="1500" step="50">
+      <button class="btn btn-p btn-sm" onclick="lockWeekDeficit()">Lock</button>
+      <button class="btn btn-s btn-sm" id="wk-unlock-btn" onclick="unlockWeekDeficit()" style="display:none" title="Reset to global default">&#8634; Unlock</button>
+      <span class="save-ok" id="wk-def-ok">&#10003; Locked</span>
+    </div>
+  </div>
+  <div class="card gap" id="log-panel"></div>
+  <div class="tbl-wrap">
+    <table class="tbl">
+      <thead><tr><th>Day</th><th>Wt</th><th>Cal</th><th>Neck</th><th>Waist</th><th>BF%</th><th>Steps</th><th></th></tr></thead>
+      <tbody id="log-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MONTHLY -->
+<div class="view" id="view-monthly">
+  <div class="ph row-b">
+    <div><div class="pt">Monthly</div><div class="ps" id="mon-lbl">—</div></div>
+    <div class="row">
+      <button class="btn btn-s btn-sm" onclick="shiftMon(-1)">&#8249; Prev</button>
+      <button class="btn btn-s btn-sm" onclick="shiftMon(1)">Next &#8250;</button>
+    </div>
+  </div>
+  <div class="card gap" id="mon-sum"></div>
+  <div id="mon-weeks" class="mgrid"></div>
+</div>
+
+<!-- CHARTS -->
+<div class="view" id="view-charts">
+  <div class="ph row-b">
+    <div><div class="pt">Charts</div><div class="ps" id="chart-sub">Weekly averages</div></div>
+    <div class="ptog">
+      <button class="pb-" id="gran-daily"   onclick="setGran('daily')">Day</button>
+      <button class="pb- on" id="gran-weekly"  onclick="setGran('weekly')">Week</button>
+      <button class="pb-" id="gran-monthly" onclick="setGran('monthly')">Month</button>
+    </div>
+  </div>
+  <div class="cwrap"><div class="ctitle">Weight (kg)</div><canvas id="chart-weight" height="170"></canvas></div>
+  <div class="cwrap"><div class="ctitle">Lean Mass (kg)</div><canvas id="chart-lean" height="170"></canvas></div>
+  <div class="cwrap"><div class="ctitle">Body Fat %</div><canvas id="chart-bf" height="170"></canvas></div>
+  <div class="cwrap"><div class="ctitle">Calories vs Maintenance</div><canvas id="chart-cals" height="170"></canvas></div>
+  <div class="cwrap"><div class="ctitle">Steps</div><canvas id="chart-steps" height="170"></canvas></div>
+</div>
+
+<!-- HISTORY -->
+<div class="view" id="view-history">
+  <div class="ph"><div class="pt">History</div><div class="ps">All logged weeks</div></div>
+  <div id="history-list"></div>
+</div>
+
+<!-- SETTINGS -->
+<div class="view" id="view-settings">
+  <div class="ph"><div class="pt">Settings</div><div class="ps">Profile &amp; preferences</div></div>
+
+  <div class="ssec">
+    <div class="stitle">Body Profile</div>
+    <div class="fgrid gap-md">
+      <div class="fg"><label>Height (cm)</label><input type="number" id="s-height" step="0.5" placeholder="172.5"></div>
+      <div class="fg"><label>Target Weight (kg)</label><input type="number" id="s-target" step="0.1" placeholder="65"></div>
+      <div class="fg full">
+        <label>Activity Factor</label>
+        <select id="s-activity">
+          <option value="1.2">Sedentary — desk job, little exercise</option>
+          <option value="1.375">Lightly Active — 1-3x/week</option>
+          <option value="1.4" selected>Moderately Active — 3-5x/week</option>
+          <option value="1.55">Very Active — 6-7x/week</option>
+          <option value="1.725">Extra Active — athlete / physical job</option>
+        </select>
+      </div>
+    </div>
+    <div class="save-row">
+      <button class="btn btn-p" onclick="saveProfile()">Save Profile</button>
+      <span class="save-ok" id="ok-profile">&#10003; Profile saved</span>
+    </div>
+  </div>
+
+  <div class="ssec">
+    <div class="stitle">&#127919; Default Deficit Goal</div>
+    <p class="tmuted gap-md">Default kcal below maintenance for any week that hasn't been locked. Lock a specific week's target from the Weekly view.</p>
+    <div class="fgrid gap-md">
+      <div class="fg"><label>Daily Deficit (kcal)</label><input type="number" id="s-deficit" step="50" placeholder="500" min="0" max="1500" oninput="updateDeficitEquiv()"></div>
+      <div class="fg"><label>Equivalent weight loss</label>
+        <div id="deficit-equiv" style="background:var(--surface2);border-radius:calc(var(--r)-2px);padding:.5rem .7rem;font-family:var(--mono);font-size:.76rem;color:var(--text2);border:1px solid var(--border)">—</div>
+      </div>
+    </div>
+    <div class="save-row">
+      <button class="btn btn-p" onclick="saveGoal()">Save Default</button>
+      <span class="save-ok" id="ok-goal">&#10003; Default saved</span>
+    </div>
+  </div>
+
+  <div class="ssec">
+    <div class="stitle">&#128205; Starting Baseline</div>
+    <p class="tmuted gap-sm">Used when there's no previous week to reference — gives week 1 a maintenance to work from.</p>
+    <div class="notice gap-md"><strong>How it works:</strong> Maintenance = Katch-McArdle BMR x Activity Factor. For week 1, this baseline fills in for "last week's data".</div>
+    <div class="fgrid gap-md">
+      <div class="fg"><label>Starting Weight (kg)</label><input type="number" id="s-sw" step="0.1" placeholder="82.0" oninput="updateStarterPreview()"></div>
+      <div class="fg"><label>Neck (cm)</label><input type="number" id="s-sn" step="0.1" placeholder="38.0" oninput="updateStarterPreview()"></div>
+      <div class="fg"><label>Waist (cm)</label><input type="number" id="s-swst" step="0.1" placeholder="96.0" oninput="updateStarterPreview()"></div>
+      <div class="fg"><label>Calculated BF%</label>
+        <div id="starter-bf-preview" style="background:var(--surface2);border-radius:calc(var(--r)-2px);padding:.5rem .7rem;font-family:var(--mono);font-size:.83rem;color:var(--text2);border:1px solid var(--border)">Enter measurements</div>
+      </div>
+    </div>
+    <div style="font-size:.7rem;color:var(--text2);margin-bottom:.8rem;font-family:var(--mono)" id="starter-maint-preview">—</div>
+    <div class="save-row">
+      <button class="btn btn-p" onclick="saveStarterBaseline()">Save Baseline</button>
+      <span class="save-ok" id="ok-baseline">&#10003; Baseline saved</span>
+    </div>
+  </div>
+
+  <div class="ssec">
+    <div class="stitle">&#128229; Import from Excel</div>
+    <p class="tmuted gap-md">Fill <strong>Date, Weight, Calories, Steps, Neck, Waist</strong> — everything else is calculated on import.</p>
+    <div class="notice gap-md"><strong>Step 1:</strong> Download the template, fill your data, save as .xlsx.<br><strong>Step 2:</strong> Drop or click to import below.</div>
+    <button class="btn btn-p btn-sm" onclick="downloadTemplate()" style="display:block;margin-bottom:.85rem">Download Template</button>
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('xl-in').click()">
+      <div class="drop-icon">&#128194;</div>
+      <div class="drop-txt">Click or drag your filled .xlsx here</div>
+    </div>
+    <input type="file" id="xl-in" accept=".xlsx,.xls" style="display:none" onchange="importExcel(event)">
+  </div>
+
+  <div class="ssec">
+    <div class="stitle">&#128228; Export</div>
+    <p class="tmuted gap-md">Download all data as a spreadsheet.</p>
+    <button class="btn btn-s" onclick="exportExcel()">Download Excel</button>
+  </div>
+
+  <div class="ssec">
+    <div class="stitle">&#128197; Date Correction</div>
+    <p class="tmuted gap-md">Shift all entries if they imported on the wrong day.</p>
+    <button class="btn btn-s" onclick="openOffsetModal()">Shift All Dates...</button>
+  </div>
+
+  <div class="ssec">
+    <div class="stitle">&#127769; Appearance</div>
+    <p class="tmuted gap-md">Theme: <span id="theme-status">Dark</span></p>
+    <div class="save-row">
+      <button class="btn btn-s" onclick="toggleTheme()"><span id="theme-btn-icon">&#9728;&#65039;</span> <span id="theme-btn-lbl">Light Mode</span></button>
+      <span class="save-ok" id="ok-theme">&#10003; Theme changed</span>
+      <button class="btn btn-s" id="settings-install-btn" onclick="installApp()" style="display:none">&#128242; Install App</button>
+    </div>
+  </div>
+
+  <div class="ssec">
+    <div class="stitle" style="color:var(--danger)">&#9888; Danger Zone</div>
+    <p class="tmuted gap-md">Permanently delete all logged entries. Settings are preserved.</p>
+    <button class="btn btn-d" onclick="openClearModal()">Clear All Data</button>
+  </div>
+</div>
+
+</div>
+</main>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <button class="bnav-btn active" data-view="dashboard" onclick="go('dashboard')"><span class="ic">&#128202;</span>Home</button>
+  <button class="bnav-btn" data-view="weekly"   onclick="go('weekly')"><span class="ic">&#128221;</span>Weekly</button>
+  <button class="bnav-btn" data-view="monthly"  onclick="go('monthly')"><span class="ic">&#128467;</span>Month</button>
+  <button class="bnav-btn" data-view="charts"   onclick="go('charts')"><span class="ic">&#128200;</span>Charts</button>
+  <button class="bnav-btn" data-view="history"  onclick="go('history')"><span class="ic">&#128197;</span>History</button>
+  <button class="bnav-btn" data-view="settings" onclick="go('settings')"><span class="ic">&#9881;</span>Settings</button>
+</nav>
+
+<!-- INSTALL BANNER -->
+<div id="install-banner">
+  <div>&#128242;</div>
+  <div class="install-txt"><strong>Install Peak Physiq</strong><br>Add to your home screen</div>
+  <button class="btn btn-p btn-sm" onclick="installApp()">Install</button>
+  <button class="mod-close" onclick="document.getElementById('install-banner').classList.remove('show')">&#10005;</button>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="overlay" id="edit-modal">
+  <div class="modal">
+    <div class="mod-hd">
+      <div class="mod-title" id="mod-title">Edit Entry</div>
+      <button class="mod-close" onclick="closeModal()">&#10005;</button>
+    </div>
+    <div class="fgrid gap-md">
+      <div class="fg"><label>Weight (kg)</label><input type="number" id="m-weight" step="0.01" placeholder="70.5"></div>
+      <div class="fg"><label>Calories</label><input type="number" id="m-cals" step="1" placeholder="1800"></div>
+      <div class="fg"><label>Neck (cm)</label><input type="number" id="m-neck" step="0.1" placeholder="38"></div>
+      <div class="fg"><label>Waist (cm)</label><input type="number" id="m-waist" step="0.1" placeholder="95"></div>
+      <div class="fg full"><label>Steps</label><input type="number" id="m-steps" step="1" placeholder="10000"></div>
+    </div>
+    <div class="row">
+      <button class="btn btn-p" style="flex:1" onclick="saveModal()">Save Changes</button>
+      <button class="btn btn-d btn-sm" onclick="deleteModal()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE WEEK MODAL -->
+<div class="overlay" id="del-modal">
+  <div class="modal" style="max-width:340px">
+    <div class="mod-hd">
+      <div class="mod-title">Delete Week</div>
+      <button class="mod-close" onclick="closeModal2('del-modal')">&#10005;</button>
+    </div>
+    <p class="tmuted gap-md" id="del-msg">Delete all entries for this week?</p>
+    <div class="row">
+      <button class="btn btn-d" style="flex:1" onclick="confirmDelWeek()">Yes, Delete</button>
+      <button class="btn btn-s btn-sm" onclick="closeModal2('del-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- CLEAR ALL MODAL -->
+<div class="overlay" id="clear-modal">
+  <div class="modal" style="max-width:340px">
+    <div class="mod-hd">
+      <div class="mod-title" style="color:var(--danger)">Clear All Data</div>
+      <button class="mod-close" onclick="closeModal2('clear-modal')">&#10005;</button>
+    </div>
+    <p class="tmuted gap-sm">Permanently deletes all logged entries.</p>
+    <p class="tmuted gap-md">Profile settings are kept.</p>
+    <div class="row">
+      <button class="btn btn-d" style="flex:1" onclick="confirmClearAll()">Yes, Delete Everything</button>
+      <button class="btn btn-s btn-sm" onclick="closeModal2('clear-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- OFFSET MODAL -->
+<div class="overlay" id="offset-modal">
+  <div class="modal" style="max-width:380px">
+    <div class="mod-hd">
+      <div class="mod-title">Shift All Dates</div>
+      <button class="mod-close" onclick="closeModal2('offset-modal')">&#10005;</button>
+    </div>
+    <p class="tmuted gap-md">Positive = forward, negative = backward.</p>
+    <div class="fg gap-md">
+      <label>Days to shift</label>
+      <input type="number" id="offset-days" value="1" min="-365" max="365" step="1" oninput="updateOffsetPreview()">
+    </div>
+    <div id="offset-preview" style="background:var(--surface2);border-radius:calc(var(--r)-2px);padding:.65rem;margin-bottom:1rem;font-size:.72rem;font-family:var(--mono);color:var(--text2);border:1px solid var(--border)">—</div>
+    <div class="row">
+      <button class="btn btn-p" style="flex:1" onclick="applyOffset()">Apply Shift</button>
+      <button class="btn btn-s btn-sm" onclick="closeModal2('offset-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+// ALL JS wrapped in DOMContentLoaded to guarantee DOM exists
+// ═══════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+
+// ─── THEME ───────────────────────────────────────────────────────────────────
+var charts = {};
+
+function getTheme() { return localStorage.getItem('pq-theme') || 'dark'; }
+
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  var dk = (t === 'dark');
+  var metaEl = document.getElementById('theme-color-meta');
+  if (metaEl) metaEl.content = dk ? '#0f0f12' : '#f5f5f0';
+  var iconEls = ['theme-icon','theme-btn-icon'];
+  iconEls.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = dk ? '&#9728;&#65039;' : '&#127769;';
+  });
+  var lblEls = ['theme-lbl','theme-btn-lbl'];
+  lblEls.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = dk ? 'Light Mode' : 'Dark Mode';
+  });
+  var ts = document.getElementById('theme-status');
+  if (ts) ts.textContent = dk ? 'Dark' : 'Light';
+  // Update charts if they exist
+  Object.values(charts).forEach(function(ch) {
+    if (!ch) return;
+    var tc = dk ? '#9090a8' : '#7a7a88';
+    var gc = dk ? '#2a2a35' : '#e0e0d8';
+    if (ch.options.plugins && ch.options.plugins.legend)
+      ch.options.plugins.legend.labels.color = tc;
+    ['x','y'].forEach(function(ax) {
+      if (ch.options.scales && ch.options.scales[ax]) {
+        ch.options.scales[ax].grid.color = gc;
+        ch.options.scales[ax].ticks.color = tc;
+      }
+    });
+    ch.update();
+  });
+}
+
+function toggleTheme() {
+  var t = getTheme() === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('pq-theme', t);
+  applyTheme(t);
+  showOk('ok-theme');
+}
+window.toggleTheme = toggleTheme;
+
+applyTheme(getTheme());
+
+// ─── SAVE CONFIRMATION ────────────────────────────────────────────────────────
+function showOk(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('show');
+  clearTimeout(el._timer);
+  el._timer = setTimeout(function() { el.classList.remove('show'); }, 2500);
+}
+
+// ─── PWA INSTALL ─────────────────────────────────────────────────────────────
+var deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  deferredPrompt = e;
+  var b = document.getElementById('install-banner');
+  if (b) b.classList.add('show');
+  var sb = document.getElementById('sb-install-btn');
+  if (sb) sb.style.display = 'flex';
+  var si = document.getElementById('settings-install-btn');
+  if (si) si.style.display = 'inline-flex';
+});
+window.addEventListener('appinstalled', function() {
+  deferredPrompt = null;
+  var b = document.getElementById('install-banner');
+  if (b) b.classList.remove('show');
+  ['sb-install-btn','settings-install-btn'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  toast('App installed!');
+});
+window.installApp = function() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(function(r) {
+    if (r.outcome === 'accepted') {
+      var b = document.getElementById('install-banner');
+      if (b) b.classList.remove('show');
+    }
+    deferredPrompt = null;
+  });
+};
+
+// ─── DATA ────────────────────────────────────────────────────────────────────
+var SK = 'peak-physiq-v1';
+
+function loadData() {
+  try {
+    var d = JSON.parse(localStorage.getItem(SK));
+    if (!d) d = defaultData();
+    if (!d.weeks) d.weeks = {};
+    if (!d.settings) d.settings = defaultData().settings;
+    return d;
+  } catch(e) { return defaultData(); }
+}
+
+function saveData(d) {
+  localStorage.setItem(SK, JSON.stringify(d));
+}
+
+function defaultData() {
+  return {
+    settings: { height: 172.5, targetWeight: 65, activityFactor: 1.4, deficitTarget: 500, starter: null },
+    days: {},
+    weeks: {}
+  };
+}
+
+var D = loadData();
+
+// ─── DATE UTILS ──────────────────────────────────────────────────────────────
+function todayStr() { return new Date().toISOString().slice(0, 10); }
+
+function monday(ds) {
+  var d = new Date(ds + 'T12:00:00');
+  var day = d.getDay();
+  var diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  return d.toISOString().slice(0, 10);
+}
+
+function addDays(ds, n) {
+  var d = new Date(ds + 'T12:00:00');
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+function weekDays(mon) {
+  var out = [];
+  for (var i = 0; i < 7; i++) out.push(addDays(mon, i));
+  return out;
+}
+
+function fmtLong(ds) {
+  return new Date(ds + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function fmtShort(ds) {
+  return new Date(ds + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+
+function fmtMonth(ds) {
+  return new Date(ds + 'T12:00:00').toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+}
+
+function dayName(ds) {
+  return new Date(ds + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long' });
+}
+
+function weekNum(ds) {
+  var mons = allMondays();
+  if (!mons.length) return 1;
+  var mon = monday(ds);
+  var idx = mons.indexOf(mon);
+  return idx >= 0 ? idx + 1 : mons.length + 1;
+}
+
+function monthName(y, m) {
+  return new Date(y, m, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+}
+
+// ─── FORMULAS ────────────────────────────────────────────────────────────────
+function calcBF(waist, neck, h) {
+  if (!waist || !neck || !h || waist <= neck) return null;
+  return 495 / (1.0324 - 0.19077 * Math.log10(waist - neck) + 0.15456 * Math.log10(h)) - 450;
+}
+
+function calcMaint(wt, bfPct, act) {
+  if (!wt || bfPct == null) return null;
+  return (370 + 21.6 * wt * (1 - bfPct / 100)) * act;
+}
+
+function avg(arr) {
+  var v = arr.filter(function(x) { return x != null && !isNaN(x); });
+  if (!v.length) return null;
+  return v.reduce(function(a, b) { return a + b; }, 0) / v.length;
+}
+
+function sumArr(arr) {
+  return arr.filter(function(x) { return x != null && !isNaN(x); }).reduce(function(a, b) { return a + b; }, 0);
+}
+
+// ─── PER-WEEK DEFICIT ────────────────────────────────────────────────────────
+function getWeekDeficit(mon) {
+  var wr = D.weeks[mon];
+  if (wr && wr.deficitTarget != null) return { val: wr.deficitTarget, src: 'locked' };
+  return { val: D.settings.deficitTarget || 500, src: 'default' };
+}
+
+function stampWeekDeficit(mon) {
+  if (!D.weeks[mon]) D.weeks[mon] = {};
+  if (D.weeks[mon].deficitTarget == null) {
+    D.weeks[mon].deficitTarget = D.settings.deficitTarget || 500;
+  }
+}
+
+// ─── STATS ENGINE ────────────────────────────────────────────────────────────
+function getBaseline(mon) {
+  var prev = wkStatsRaw(addDays(mon, -7));
+  if (prev.aW != null || prev.aBf != null) return { bW: prev.aW, bBf: prev.aBf, src: 'lastWeek' };
+  var sb = D.settings.starter;
+  if (sb && (sb.weight != null || sb.bf != null)) return { bW: sb.weight, bBf: sb.bf, src: 'starter' };
+  return { bW: null, bBf: null, src: 'none' };
+}
+
+function wkStatsRaw(mon) {
+  var days = weekDays(mon);
+  var ents = days.map(function(d) { return D.days[d] || null; });
+  var h = D.settings.height;
+  var wts = ents.map(function(e) { return e ? e.weight : null; });
+  var cals = ents.map(function(e) { return e ? e.calories : null; });
+  var bfs = ents.map(function(e) { return (e && e.waist && e.neck) ? calcBF(e.waist, e.neck, h) : null; });
+  var steps = ents.map(function(e) { return e ? e.steps : null; });
+  var aW = avg(wts), aC = avg(cals), aBf = avg(bfs), aS = avg(steps);
+  var totC = sumArr(cals.filter(function(v) { return v != null; }));
+  return { days: days, ents: ents, wts: wts, cals: cals, bfs: bfs, steps: steps, aW: aW, aC: aC, aBf: aBf, aS: aS, totC: totC };
+}
+
+function wkStats(mon) {
+  var raw = wkStatsRaw(mon);
+  var act = D.settings.activityFactor;
+  var bl = getBaseline(mon);
+  var mn = calcMaint(bl.bW, bl.bBf, act);
+  var lean = (raw.aW != null && raw.aBf != null) ? raw.aW * (1 - raw.aBf / 100) : null;
+  var def = getWeekDeficit(mon);
+  var defTarget = def.val, defSrc = def.src;
+  var targetIntake = (mn != null) ? mn - defTarget : null;
+  var aDef = (mn != null && raw.aC != null) ? mn - raw.aC : null;
+  var loggedDays = raw.cals.filter(function(v) { return v != null; }).length;
+  var tDef = (mn != null && loggedDays > 0) ? mn * loggedDays - raw.totC : null;
+  return Object.assign({}, raw, {
+    lean: lean, mn: mn, aDef: aDef, tDef: tDef,
+    defTarget: defTarget, defSrc: defSrc, targetIntake: targetIntake,
+    bW: bl.bW, bBf: bl.bBf
+  });
+}
+
+function allMondays() {
+  var ds = Object.keys(D.days).sort();
+  if (!ds.length) return [];
+  var seen = {};
+  var out = [];
+  ds.forEach(function(d) {
+    var m = monday(d);
+    if (!seen[m]) { seen[m] = true; out.push(m); }
+  });
+  return out.sort();
+}
+
+function weeksInMonth(y, m) {
+  return allMondays().filter(function(mn) {
+    var d = new Date(mn + 'T12:00:00');
+    return d.getFullYear() === y && d.getMonth() === m;
+  });
+}
+
+function monStats(y, m) {
+  var wks = weeksInMonth(y, m);
+  if (!wks.length) return null;
+  var ws = wks.map(function(w) { return wkStats(w); });
+  return {
+    wks: wks, ws: ws,
+    aW: avg(ws.map(function(s) { return s.aW; }).filter(function(v) { return v != null; })),
+    aBf: avg(ws.map(function(s) { return s.aBf; }).filter(function(v) { return v != null; })),
+    aC: avg(ws.map(function(s) { return s.aC; }).filter(function(v) { return v != null; })),
+    aS: avg(ws.map(function(s) { return s.aS; }).filter(function(v) { return v != null; })),
+    aLean: avg(ws.map(function(s) { return s.lean; }).filter(function(v) { return v != null; })),
+    tDef: sumArr(ws.map(function(s) { return s.tDef; }).filter(function(v) { return v != null; })),
+    mn: avg(ws.map(function(s) { return s.mn; }).filter(function(v) { return v != null; }))
+  };
+}
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+var curView = 'dashboard';
+
+function go(view) {
+  document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
+  document.querySelectorAll('[data-view]').forEach(function(b) { b.classList.remove('active'); });
+  var viewEl = document.getElementById('view-' + view);
+  if (viewEl) viewEl.classList.add('active');
+  document.querySelectorAll('[data-view="' + view + '"]').forEach(function(b) { b.classList.add('active'); });
+  curView = view;
+  window.scrollTo(0, 0);
+  if (view === 'dashboard') renderDash();
+  if (view === 'weekly') renderLog();
+  if (view === 'monthly') renderMon();
+  if (view === 'charts') renderCharts();
+  if (view === 'history') renderHistory();
+  if (view === 'settings') loadSettingsUI();
+}
+
+window.go = go;
+
+// ─── DASHBOARD ───────────────────────────────────────────────────────────────
+var dPer = 'weekly', dMon = monday(todayStr()), dMonth = new Date().getMonth(), dYear = new Date().getFullYear();
+
+function setDP(p) {
+  dPer = p;
+  document.getElementById('dp-weekly').classList.toggle('on', p === 'weekly');
+  document.getElementById('dp-monthly').classList.toggle('on', p === 'monthly');
+  renderDash();
+}
+window.setDP = setDP;
+
+function shiftDP(d) {
+  if (dPer === 'weekly') {
+    dMon = addDays(dMon, d * 7);
+  } else {
+    dMonth += d;
+    if (dMonth > 11) { dMonth = 0; dYear++; }
+    if (dMonth < 0) { dMonth = 11; dYear--; }
+  }
+  renderDash();
+}
+window.shiftDP = shiftDP;
+
+function resetDP() {
+  dMon = monday(todayStr());
+  dMonth = new Date().getMonth();
+  dYear = new Date().getFullYear();
+  renderDash();
+}
+window.resetDP = resetDP;
+
+function renderDash() {
+  var t = todayStr();
+  var dateEl = document.getElementById('dash-date');
+  if (dateEl) dateEl.textContent = fmtLong(t) + ' · ' + dayName(t);
+  var todayEl = document.getElementById('today-lbl');
+  if (todayEl) todayEl.textContent = fmtLong(t);
+  if (dPer === 'weekly') renderDashW(); else renderDashM();
+  var e = D.days[t];
+  if (e) {
+    document.getElementById('f-weight').value = e.weight || '';
+    document.getElementById('f-calories').value = e.calories || '';
+    document.getElementById('f-neck').value = e.neck || '';
+    document.getElementById('f-waist').value = e.waist || '';
+    document.getElementById('f-steps').value = e.steps || '';
+    calcPrev();
+  }
+}
+
+function renderDashW() {
+  var s = wkStats(dMon);
+  document.getElementById('dp-lbl').textContent = fmtShort(dMon) + ' – ' + fmtShort(addDays(dMon, 6));
+  document.getElementById('dp-sum-lbl').textContent = 'Week ' + weekNum(dMon);
+  setMets([
+    { v: s.aW ? s.aW.toFixed(1) + ' kg' : '—', l: 'Avg Wt' },
+    { v: s.aBf ? s.aBf.toFixed(1) + '%' : '—', l: 'BF%' },
+    { v: s.aC ? Math.round(s.aC) : '—', l: 'Avg Cal' },
+    { v: s.mn ? Math.round(s.mn) : '—', l: 'Maint.' },
+    { v: s.aDef != null ? (s.aDef > 0 ? '+' : '') + Math.round(s.aDef) : '—', l: 'Deficit' },
+    { v: s.aS ? Math.round(s.aS).toLocaleString() : '—', l: 'Steps' }
+  ]);
+  var tag = document.getElementById('dp-tag');
+  if (!s.mn && !s.bW) { tag.textContent = 'Set baseline'; tag.className = 'tag ta'; }
+  else if (s.aDef > 0) { tag.textContent = 'In Deficit'; tag.className = 'tag tg'; }
+  else if (s.aDef < 0) { tag.textContent = 'Surplus'; tag.className = 'tag tb'; }
+  else { tag.textContent = 'In progress'; tag.className = 'tag ta'; }
+  goalBar(s.aW);
+  var last = wkStats(addDays(dMon, -7));
+  var wch = (s.aW && last.aW) ? s.aW - last.aW : null;
+  var curWt = null;
+  for (var i = 0; i < 7; i++) {
+    var d = addDays(todayStr(), -i);
+    if (D.days[d] && D.days[d].weight) { curWt = D.days[d].weight; break; }
+  }
+  var tgt = D.settings.targetWeight;
+  document.getElementById('key-stats').innerHTML = [
+    { l: 'Current Weight', v: curWt ? curWt + ' kg' : '—', s: wch != null ? (wch < 0 ? '&#8595; ' + Math.abs(wch).toFixed(2) : '&#8593; ' + wch.toFixed(2)) + ' kg vs last week' : null, g: wch < 0 },
+    { l: 'Target Weight', v: tgt + ' kg', s: s.aW ? (s.aW - tgt).toFixed(1) + ' kg remaining' : null, g: null },
+    { l: 'Weekly Deficit', v: s.tDef != null ? Math.round(s.tDef) + ' kcal' : '—', s: s.mn != null ? 'Maint: ' + Math.round(s.mn) + ' · Target: ' + (s.targetIntake != null ? Math.round(s.targetIntake) + ' kcal' : '—') : 'No baseline — set in Settings', g: s.tDef > 0 },
+    { l: 'Lean Mass', v: s.lean ? s.lean.toFixed(1) + ' kg' : '—', s: s.aBf ? s.aBf.toFixed(1) + '% body fat' : null, g: null }
+  ].map(function(x) {
+    return '<div class="sc"><div class="sl">' + x.l + '</div><div class="sv">' + x.v + '</div>' + (x.s ? '<div class="ss ' + (x.g === true ? 'dg' : x.g === false ? 'db' : 'dn') + '">' + x.s + '</div>' : '') + '</div>';
+  }).join('');
+}
+
+function renderDashM() {
+  var ms = monStats(dYear, dMonth);
+  document.getElementById('dp-lbl').textContent = monthName(dYear, dMonth);
+  document.getElementById('dp-sum-lbl').textContent = monthName(dYear, dMonth);
+  if (!ms) {
+    document.getElementById('dp-mets').innerHTML = '<div class="tmuted">No data this month.</div>';
+    document.getElementById('key-stats').innerHTML = '';
+    goalBar(null);
+    return;
+  }
+  setMets([
+    { v: ms.aW ? ms.aW.toFixed(1) + ' kg' : '—', l: 'Avg Wt' },
+    { v: ms.aBf ? ms.aBf.toFixed(1) + '%' : '—', l: 'BF%' },
+    { v: ms.aC ? Math.round(ms.aC) : '—', l: 'Avg Cal' },
+    { v: ms.mn ? Math.round(ms.mn) : '—', l: 'Maint.' },
+    { v: ms.tDef ? Math.round(ms.tDef) : '—', l: 'Total Def.' },
+    { v: ms.aS ? Math.round(ms.aS).toLocaleString() : '—', l: 'Steps' }
+  ]);
+  document.getElementById('dp-tag').textContent = ms.wks.length + ' week' + (ms.wks.length !== 1 ? 's' : '');
+  document.getElementById('dp-tag').className = 'tag ta';
+  goalBar(ms.aW);
+  document.getElementById('key-stats').innerHTML = [
+    { l: 'Avg Weight', v: ms.aW ? ms.aW.toFixed(1) + ' kg' : '—', s: null },
+    { l: 'Avg Body Fat', v: ms.aBf ? ms.aBf.toFixed(1) + '%' : '—', s: null },
+    { l: 'Monthly Deficit', v: ms.tDef ? Math.round(ms.tDef) + ' kcal' : '—', s: ms.mn ? 'Maint: ' + Math.round(ms.mn) + ' kcal/day' : null, g: ms.tDef > 0 },
+    { l: 'Avg Steps', v: ms.aS ? Math.round(ms.aS).toLocaleString() : '—', s: null }
+  ].map(function(x) {
+    return '<div class="sc"><div class="sl">' + x.l + '</div><div class="sv">' + x.v + '</div>' + (x.s ? '<div class="ss ' + (x.g === true ? 'dg' : 'dn') + '">' + x.s + '</div>' : '') + '</div>';
+  }).join('');
+}
+
+function setMets(mets) {
+  document.getElementById('dp-mets').innerHTML = mets.map(function(m) {
+    return '<div class="met"><div class="met-v">' + m.v + '</div><div class="met-l">' + m.l + '</div></div>';
+  }).join('');
+}
+
+function goalBar(curWt) {
+  var st = null;
+  var keys = Object.keys(D.days).sort();
+  for (var i = 0; i < keys.length; i++) {
+    if (D.days[keys[i]] && D.days[keys[i]].weight) { st = D.days[keys[i]].weight; break; }
+  }
+  var tgt = D.settings.targetWeight;
+  var bar = document.getElementById('goal-bar');
+  var txt = document.getElementById('goal-txt');
+  if (st && curWt && tgt && bar && txt) {
+    var lost = st - curWt, toGo = st - tgt;
+    var pct = Math.min(100, Math.max(0, (lost / toGo) * 100));
+    bar.style.width = pct.toFixed(1) + '%';
+    txt.textContent = lost.toFixed(1) + ' kg lost · ' + (curWt - tgt).toFixed(1) + ' kg to go';
+  }
+}
+
+function calcPrev() {
+  var w = parseFloat(document.getElementById('f-waist').value);
+  var n = parseFloat(document.getElementById('f-neck').value);
+  var cal = parseFloat(document.getElementById('f-calories').value);
+  var h = D.settings.height;
+  var b = calcBF(w, n, h);
+  var s = wkStats(monday(todayStr()));
+  var has = (b !== null) || (!isNaN(cal) && cal > 0);
+  document.getElementById('calc-prev').style.display = has ? 'block' : 'none';
+  if (b !== null) document.getElementById('calc-bf').textContent = b.toFixed(1) + '%';
+  if (!isNaN(cal) && cal > 0 && s.mn) {
+    var def = s.mn - cal;
+    var defEl = document.getElementById('calc-def');
+    defEl.textContent = (def > 0 ? '-' : '+') + Math.abs(Math.round(def)) + ' kcal';
+    defEl.style.color = def > 0 ? 'var(--good)' : 'var(--danger)';
+  }
+  if (s.targetIntake) document.getElementById('calc-target').textContent = Math.round(s.targetIntake) + ' kcal';
+}
+window.calcPrev = calcPrev;
+
+function saveToday() {
+  var t = todayStr();
+  var weight = parseFloat(document.getElementById('f-weight').value);
+  var calories = parseFloat(document.getElementById('f-calories').value);
+  var neck = parseFloat(document.getElementById('f-neck').value);
+  var waist = parseFloat(document.getElementById('f-waist').value);
+  var steps = parseFloat(document.getElementById('f-steps').value);
+  if (!weight && !calories && !neck && !waist && !steps) { toast('Enter at least one value'); return; }
+  stampWeekDeficit(monday(t));
+  D.days[t] = {
+    weight: isNaN(weight) ? null : weight,
+    calories: isNaN(calories) ? null : calories,
+    neck: isNaN(neck) ? null : neck,
+    waist: isNaN(waist) ? null : waist,
+    steps: isNaN(steps) ? null : steps
+  };
+  saveData(D);
+  toast('Saved!');
+  renderDash();
+}
+window.saveToday = saveToday;
+
+// ─── WEEKLY VIEW ─────────────────────────────────────────────────────────────
+var logMon = monday(todayStr());
+
+function shiftLog(dir) { logMon = addDays(logMon, dir * 7); renderLog(); }
+window.shiftLog = shiftLog;
+
+function renderLog() {
+  var s = wkStats(logMon), t = todayStr();
+  document.getElementById('log-lbl').textContent = fmtLong(logMon) + ' – ' + fmtLong(addDays(logMon, 6));
+
+  // Deficit bar
+  var def = getWeekDeficit(logMon);
+  document.getElementById('wk-def-val').textContent = def.val + ' kcal/day';
+  document.getElementById('wk-def-src').textContent = def.src === 'locked' ? 'Locked for this week — click Unlock to revert to default' : 'Using global default — enter a value and click Lock to override';
+  document.getElementById('wk-def-input').value = def.val;
+  var unlockBtn = document.getElementById('wk-unlock-btn');
+  if (unlockBtn) unlockBtn.style.display = def.src === 'locked' ? 'inline-flex' : 'none';
+
+  // Summary panel
+  var panel = document.getElementById('log-panel');
+  if (s.aW || s.aC) {
+    panel.innerHTML = '<div class="info-grid">' + [
+      ['Avg Weight', s.aW ? s.aW.toFixed(2) + ' kg' : '—'],
+      ['Avg Calories', s.aC ? Math.round(s.aC) : '—'],
+      ['Avg BF%', s.aBf ? s.aBf.toFixed(1) + '%' : '—'],
+      ['Lean Mass', s.lean ? s.lean.toFixed(1) + ' kg' : '—'],
+      ['Maintenance', s.mn ? Math.round(s.mn) + ' kcal' : '—'],
+      ['Target Intake', s.targetIntake ? Math.round(s.targetIntake) + ' kcal' : '—'],
+      ['Weekly Deficit', s.tDef != null ? Math.round(s.tDef) + ' kcal' : '—'],
+      ['Avg Steps', s.aS ? Math.round(s.aS).toLocaleString() : '—']
+    ].map(function(x) { return '<div class="info-item"><div class="sl">' + x[0] + '</div><div class="sv">' + x[1] + '</div></div>'; }).join('') + '</div>';
+  } else {
+    panel.innerHTML = '<div class="tmuted">No data this week yet.</div>';
+  }
+
+  // Table
+  document.getElementById('log-body').innerHTML = s.days.map(function(d, i) {
+    var e = s.ents[i], b = s.bfs[i], isT = d === t;
+    return '<tr class="' + (isT ? 'tr-today' : '') + '">' +
+      '<td><div class="dn-cell">' + dayName(d).slice(0, 3) + '</div><div style="font-size:.56rem;color:var(--text2);font-family:var(--mono)">' + fmtShort(d) + '</div></td>' +
+      '<td class="tm">' + (e && e.weight != null ? e.weight : '—') + '</td>' +
+      '<td class="tm">' + (e && e.calories != null ? e.calories : '—') + '</td>' +
+      '<td class="tm">' + (e && e.neck != null ? e.neck : '—') + '</td>' +
+      '<td class="tm">' + (e && e.waist != null ? e.waist : '—') + '</td>' +
+      '<td class="tm comp">' + (b != null ? b.toFixed(1) + '%' : '—') + '</td>' +
+      '<td class="tm">' + (e && e.steps ? e.steps.toLocaleString() : '—') + '</td>' +
+      '<td><button class="btn btn-s btn-sm" onclick="openModal(\'' + d + '\')">Edit</button></td>' +
+      '</tr>';
+  }).join('');
+}
+
+function lockWeekDeficit() {
+  var val = parseFloat(document.getElementById('wk-def-input').value);
+  if (isNaN(val) || val < 0) { toast('Enter a valid kcal value'); return; }
+  if (!D.weeks[logMon]) D.weeks[logMon] = {};
+  D.weeks[logMon].deficitTarget = val;
+  saveData(D);
+  showOk('wk-def-ok');
+  renderLog();
+  if (curView === 'dashboard') renderDash();
+}
+window.lockWeekDeficit = lockWeekDeficit;
+
+function unlockWeekDeficit() {
+  if (D.weeks[logMon]) delete D.weeks[logMon].deficitTarget;
+  saveData(D);
+  toast('Reverted to default');
+  renderLog();
+}
+window.unlockWeekDeficit = unlockWeekDeficit;
+
+// ─── MONTHLY ─────────────────────────────────────────────────────────────────
+var monY = new Date().getFullYear(), monM = new Date().getMonth();
+
+function shiftMon(dir) {
+  monM += dir;
+  if (monM > 11) { monM = 0; monY++; }
+  if (monM < 0) { monM = 11; monY--; }
+  renderMon();
+}
+window.shiftMon = shiftMon;
+
+function renderMon() {
+  var lbl = monthName(monY, monM);
+  document.getElementById('mon-lbl').textContent = lbl;
+  var ms = monStats(monY, monM);
+  var sumEl = document.getElementById('mon-sum');
+  if (!ms) {
+    sumEl.innerHTML = '<div class="tmuted">No data this month.</div>';
+    document.getElementById('mon-weeks').innerHTML = '';
+    return;
+  }
+  sumEl.innerHTML = '<div class="ftitle gap-sm">' + lbl + ' — Summary</div><div class="info-grid">' + [
+    ['Avg Weight', ms.aW ? ms.aW.toFixed(2) + ' kg' : '—'],
+    ['Avg Body Fat', ms.aBf ? ms.aBf.toFixed(1) + '%' : '—'],
+    ['Avg Calories', ms.aC ? Math.round(ms.aC) + ' kcal' : '—'],
+    ['Maintenance', ms.mn ? Math.round(ms.mn) + ' kcal' : '—'],
+    ['Total Deficit', ms.tDef ? Math.round(ms.tDef) + ' kcal' : '—'],
+    ['Avg Steps', ms.aS ? Math.round(ms.aS).toLocaleString() : '—']
+  ].map(function(x) { return '<div class="info-item"><div class="sl">' + x[0] + '</div><div class="sv">' + x[1] + '</div></div>'; }).join('') + '</div>';
+
+  document.getElementById('mon-weeks').innerHTML = ms.ws.map(function(s, i) {
+    var mn = ms.wks[i], nd = s.ents.filter(Boolean).length;
+    return '<div class="mrow"><div><div class="mwn">Week ' + weekNum(mn) + '</div><div class="mwd">' + fmtShort(mn) + ' – ' + fmtShort(addDays(mn, 6)) + '</div><div style="font-size:.52rem;color:var(--text2);font-family:var(--mono);margin-top:2px">' + nd + '/7 days</div></div><div class="mmets">' +
+      [['Avg Wt', s.aW ? s.aW.toFixed(1) + ' kg' : '—'], ['BF%', s.aBf ? s.aBf.toFixed(1) + '%' : '—'], ['Cal', s.aC ? Math.round(s.aC) : '—'], ['Deficit', s.tDef != null ? Math.round(s.tDef) : '—'], ['Steps', s.aS ? (Math.round(s.aS / 1000)).toFixed(1) + 'k' : '—']].map(function(x) {
+        return '<div class="mmi"><div class="mmv">' + x[1] + '</div><div class="mml">' + x[0] + '</div></div>';
+      }).join('') + '</div></div>';
+  }).join('');
+}
+
+// ─── EDIT MODAL ──────────────────────────────────────────────────────────────
+var modDate = null;
+
+function openModal(ds) {
+  modDate = ds;
+  var e = D.days[ds] || {};
+  document.getElementById('mod-title').textContent = dayName(ds).slice(0, 3) + ', ' + fmtLong(ds);
+  document.getElementById('m-weight').value = e.weight || '';
+  document.getElementById('m-cals').value = e.calories || '';
+  document.getElementById('m-neck').value = e.neck || '';
+  document.getElementById('m-waist').value = e.waist || '';
+  document.getElementById('m-steps').value = e.steps || '';
+  document.getElementById('edit-modal').classList.add('open');
+}
+window.openModal = openModal;
+
+function closeModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+  modDate = null;
+}
+window.closeModal = closeModal;
+
+function closeModal2(id) {
+  var el = document.getElementById(id);
+  if (el) el.classList.remove('open');
+}
+window.closeModal2 = closeModal2;
+
+function saveModal() {
+  if (!modDate) return;
+  var weight = parseFloat(document.getElementById('m-weight').value);
+  var calories = parseFloat(document.getElementById('m-cals').value);
+  var neck = parseFloat(document.getElementById('m-neck').value);
+  var waist = parseFloat(document.getElementById('m-waist').value);
+  var steps = parseFloat(document.getElementById('m-steps').value);
+  stampWeekDeficit(monday(modDate));
+  D.days[modDate] = {
+    weight: isNaN(weight) ? null : weight,
+    calories: isNaN(calories) ? null : calories,
+    neck: isNaN(neck) ? null : neck,
+    waist: isNaN(waist) ? null : waist,
+    steps: isNaN(steps) ? null : steps
+  };
+  saveData(D);
+  closeModal();
+  toast('Updated!');
+  refresh();
+}
+window.saveModal = saveModal;
+
+function deleteModal() {
+  if (!modDate) return;
+  delete D.days[modDate];
+  saveData(D);
+  closeModal();
+  toast('Entry deleted');
+  refresh();
+}
+window.deleteModal = deleteModal;
+
+function refresh() {
+  if (curView === 'weekly') renderLog();
+  if (curView === 'history') renderHistory();
+  if (curView === 'monthly') renderMon();
+  renderDash();
+}
+
+// Click-outside to close modals
+['edit-modal','del-modal','clear-modal','offset-modal'].forEach(function(id) {
+  var el = document.getElementById(id);
+  if (el) el.addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+});
+
+// ─── DELETE WEEK ─────────────────────────────────────────────────────────────
+var delWeekMon = null;
+
+function openDelWeek(mon) {
+  delWeekMon = mon;
+  var msgEl = document.getElementById('del-msg');
+  if (msgEl) msgEl.textContent = 'Delete Week ' + weekNum(mon) + ' (' + fmtShort(mon) + ' – ' + fmtShort(addDays(mon, 6)) + ')?';
+  document.getElementById('del-modal').classList.add('open');
+}
+window.openDelWeek = openDelWeek;
+
+function confirmDelWeek() {
+  if (!delWeekMon) return;
+  weekDays(delWeekMon).forEach(function(d) { delete D.days[d]; });
+  if (D.weeks[delWeekMon]) delete D.weeks[delWeekMon];
+  saveData(D);
+  closeModal2('del-modal');
+  delWeekMon = null;
+  toast('Week deleted');
+  renderHistory();
+  renderDash();
+}
+window.confirmDelWeek = confirmDelWeek;
+
+function openClearModal() { document.getElementById('clear-modal').classList.add('open'); }
+window.openClearModal = openClearModal;
+
+function confirmClearAll() {
+  var saved = Object.assign({}, D.settings);
+  D = defaultData();
+  D.settings = saved;
+  saveData(D);
+  closeModal2('clear-modal');
+  toast('All data cleared');
+  renderDash();
+  if (curView === 'history') renderHistory();
+}
+window.confirmClearAll = confirmClearAll;
+
+// ─── TOGGLE WEEK EXPAND ──────────────────────────────────────────────────────
+function toggleHW(idx) {
+  var el = document.getElementById('hw-' + idx);
+  if (el) el.classList.toggle('open');
+}
+window.toggleHW = toggleHW;
+
+// ─── HISTORY ─────────────────────────────────────────────────────────────────
+function renderHistory() {
+  var mons = allMondays().reverse();
+  var c = document.getElementById('history-list');
+  if (!mons.length) {
+    c.innerHTML = '<div class="empty"><div class="empty-ic">&#128197;</div><div class="empty-t">No history yet</div><div class="empty-s">Start logging to see history.</div></div>';
+    return;
+  }
+  c.innerHTML = mons.map(function(m, idx) {
+    var s = wkStats(m), prev = wkStats(addDays(m, -7));
+    var wch = (s.aW && prev.aW) ? (s.aW - prev.aW).toFixed(2) : null;
+    var def = getWeekDeficit(m);
+    var rows = s.days.map(function(d, i) {
+      var e = s.ents[i], b = s.bfs[i];
+      return '<tr>' +
+        '<td><div class="dn-cell">' + dayName(d).slice(0, 3) + '</div><div style="font-size:.54rem;color:var(--text2);font-family:var(--mono)">' + fmtShort(d) + '</div></td>' +
+        '<td class="tm">' + (e && e.weight != null ? e.weight : '—') + '</td>' +
+        '<td class="tm">' + (e && e.calories != null ? e.calories : '—') + '</td>' +
+        '<td class="tm">' + (e && e.neck != null ? e.neck : '—') + '</td>' +
+        '<td class="tm">' + (e && e.waist != null ? e.waist : '—') + '</td>' +
+        '<td class="tm comp">' + (b != null ? b.toFixed(1) + '%' : '—') + '</td>' +
+        '<td class="tm">' + (e && e.steps ? e.steps.toLocaleString() : '—') + '</td>' +
+        '<td><button class="btn btn-s btn-sm" onclick="openModal(\'' + d + '\');event.stopPropagation()">Edit</button></td>' +
+        '</tr>';
+    }).join('');
+    var statsHtml = (s.aW ? '<span>' + s.aW.toFixed(1) + ' kg</span>' : '') +
+      (s.aBf ? ' <span>' + s.aBf.toFixed(1) + '% bf</span>' : '') +
+      (wch && parseFloat(wch) !== 0 ? ' <span class="' + (parseFloat(wch) < 0 ? 'dg' : 'db') + '">' + (parseFloat(wch) > 0 ? '+' : '') + wch + ' kg</span>' : '');
+    return '<div class="hw">' +
+      '<div class="hw-hd" onclick="toggleHW(' + idx + ')">' +
+        '<div><div class="hw-title">Week ' + weekNum(m) + '</div><div style="font-size:.58rem;color:var(--text2);margin-top:2px;font-family:var(--mono)">' + fmtLong(m) + ' – ' + fmtLong(addDays(m, 6)) + '</div></div>' +
+        '<div class="hw-stats">' + statsHtml + ' <span>&#9662;</span></div>' +
+      '</div>' +
+      '<div class="hw-body" id="hw-' + idx + '">' +
+        '<div class="info-grid gap-md">' + [
+          ['Avg Weight', s.aW ? s.aW.toFixed(2) + ' kg' : '—'],
+          ['Avg BF%', s.aBf ? s.aBf.toFixed(1) + '%' : '—'],
+          ['Lean Mass', s.lean ? s.lean.toFixed(1) + ' kg' : '—'],
+          ['Maintenance', s.mn != null ? Math.round(s.mn) + ' kcal' : '—'],
+          ['Deficit Target', def.val + ' kcal ' + (def.src === 'locked' ? '(locked)' : '(default)')],
+          ['Weekly Deficit', s.tDef != null ? Math.round(s.tDef) + ' kcal' : '—'],
+          ['Avg Steps', s.aS ? Math.round(s.aS).toLocaleString() : '—']
+        ].map(function(x) { return '<div class="info-item"><div class="sl">' + x[0] + '</div><div class="sv">' + x[1] + '</div></div>'; }).join('') + '</div>' +
+        '<div class="tbl-wrap gap-md"><table class="tbl" style="min-width:360px"><thead><tr><th>Day</th><th>Wt</th><th>Cal</th><th>Neck</th><th>Waist</th><th>BF%</th><th>Steps</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+        '<div style="display:flex;justify-content:flex-end"><button class="btn btn-d btn-sm" onclick="openDelWeek(\'' + m + '\');event.stopPropagation()">Delete Week</button></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ─── SETTINGS ────────────────────────────────────────────────────────────────
+function loadSettingsUI() {
+  var s = D.settings;
+  document.getElementById('s-height').value = s.height || 172.5;
+  document.getElementById('s-target').value = s.targetWeight || 65;
+  document.getElementById('s-activity').value = s.activityFactor || 1.4;
+  document.getElementById('s-deficit').value = s.deficitTarget || 500;
+  updateDeficitEquiv();
+  var sb = s.starter || {};
+  document.getElementById('s-sw').value = sb.weight || '';
+  document.getElementById('s-sn').value = sb.neck || '';
+  document.getElementById('s-swst').value = sb.waist || '';
+  if (sb.weight || sb.neck || sb.waist) updateStarterPreview();
+}
+
+function saveProfile() {
+  D.settings.height = parseFloat(document.getElementById('s-height').value) || 172.5;
+  D.settings.targetWeight = parseFloat(document.getElementById('s-target').value) || 65;
+  D.settings.activityFactor = parseFloat(document.getElementById('s-activity').value) || 1.4;
+  saveData(D);
+  showOk('ok-profile');
+  toast('Profile saved');
+}
+window.saveProfile = saveProfile;
+
+function saveGoal() {
+  D.settings.deficitTarget = parseFloat(document.getElementById('s-deficit').value) || 500;
+  saveData(D);
+  showOk('ok-goal');
+  toast('Default deficit saved');
+}
+window.saveGoal = saveGoal;
+
+function updateDeficitEquiv() {
+  var d = parseFloat(document.getElementById('s-deficit').value) || 0;
+  var el = document.getElementById('deficit-equiv');
+  if (el) el.textContent = d > 0 ? '~' + (d * 7 / 7700).toFixed(2) + ' kg/week loss' : 'No deficit set';
+}
+window.updateDeficitEquiv = updateDeficitEquiv;
+
+function updateStarterPreview() {
+  var w = parseFloat(document.getElementById('s-sw').value);
+  var n = parseFloat(document.getElementById('s-sn').value);
+  var wst = parseFloat(document.getElementById('s-swst').value);
+  var h = D.settings.height || parseFloat(document.getElementById('s-height').value) || 172.5;
+  var act = D.settings.activityFactor || 1.4;
+  var bfVal = calcBF(wst, n, h);
+  var bfEl = document.getElementById('starter-bf-preview');
+  var mnEl = document.getElementById('starter-maint-preview');
+  if (bfVal != null) {
+    bfEl.textContent = bfVal.toFixed(1) + '%';
+    bfEl.style.color = 'var(--text)';
+    var mn = calcMaint(w, bfVal, act);
+    mnEl.innerHTML = 'Lean Mass: <strong>' + (w * (1 - bfVal / 100)).toFixed(1) + ' kg</strong> · Maintenance: <strong>' + (mn ? Math.round(mn) + ' kcal/day' : '—') + '</strong>';
+  } else {
+    bfEl.textContent = (!isNaN(w) && !isNaN(n) && !isNaN(wst)) ? (wst <= n ? 'Waist must exceed neck' : 'Enter all 3 values') : 'Enter measurements';
+    bfEl.style.color = 'var(--text2)';
+    mnEl.textContent = '—';
+  }
+}
+window.updateStarterPreview = updateStarterPreview;
+
+function saveStarterBaseline() {
+  var w = parseFloat(document.getElementById('s-sw').value);
+  var n = parseFloat(document.getElementById('s-sn').value);
+  var wst = parseFloat(document.getElementById('s-swst').value);
+  var h = D.settings.height || 172.5;
+  if (isNaN(w)) { toast('Enter starting weight'); return; }
+  D.settings.starter = {
+    weight: isNaN(w) ? null : w,
+    neck: isNaN(n) ? null : n,
+    waist: isNaN(wst) ? null : wst,
+    bf: calcBF(wst, n, h)
+  };
+  saveData(D);
+  showOk('ok-baseline');
+  toast('Baseline saved');
+  updateStarterPreview();
+  renderDash();
+}
+window.saveStarterBaseline = saveStarterBaseline;
+
+// ─── CHARTS ──────────────────────────────────────────────────────────────────
+var gran = 'weekly';
+
+function setGran(g) {
+  gran = g;
+  ['daily','weekly','monthly'].forEach(function(x) {
+    document.getElementById('gran-' + x).classList.toggle('on', x === g);
+  });
+  var subMap = { daily: 'Daily entries', weekly: 'Weekly averages', monthly: 'Monthly averages' };
+  document.getElementById('chart-sub').textContent = subMap[g];
+  renderCharts();
+}
+window.setGran = setGran;
+
+function getChartData() {
+  var dk = getTheme() === 'dark', tc = dk ? '#9090a8' : '#7a7a88', gc = dk ? '#2a2a35' : '#e0e0d8';
+  var h = D.settings.height;
+
+  if (gran === 'daily') {
+    var ds = Object.keys(D.days).sort();
+    if (!ds.length) return null;
+    var bfArr = ds.map(function(d) {
+      var e = D.days[d];
+      return (e && e.waist && e.neck) ? calcBF(e.waist, e.neck, h) : null;
+    });
+    return {
+      labels: ds.map(fmtShort),
+      weight: ds.map(function(d) { return D.days[d] ? D.days[d].weight : null; }),
+      bf: bfArr,
+      lean: ds.map(function(d, i) {
+        var w = D.days[d] ? D.days[d].weight : null;
+        var b = bfArr[i];
+        return (w != null && b != null) ? +(w * (1 - b / 100)).toFixed(2) : null;
+      }),
+      calsIn: ds.map(function(d) { return D.days[d] ? D.days[d].calories : null; }),
+      maint: ds.map(function(d) { var s = wkStats(monday(d)); return s.mn ? Math.round(s.mn) : null; }),
+      steps: ds.map(function(d) { return D.days[d] ? D.days[d].steps : null; }),
+      tc: tc, gc: gc
+    };
+  }
+
+  if (gran === 'weekly') {
+    var mons = allMondays();
+    if (!mons.length) return null;
+    var ws = mons.map(function(m) { return wkStats(m); });
+    return {
+      labels: mons.map(fmtShort),
+      weight: ws.map(function(s) { return s.aW != null ? s.aW : null; }),
+      bf: ws.map(function(s) { return s.aBf != null ? s.aBf : null; }),
+      lean: ws.map(function(s) { return s.lean != null ? +s.lean.toFixed(2) : null; }),
+      calsIn: ws.map(function(s) { return s.aC ? Math.round(s.aC) : null; }),
+      maint: ws.map(function(s) { return s.mn ? Math.round(s.mn) : null; }),
+      steps: ws.map(function(s) { return s.aS ? Math.round(s.aS) : null; }),
+      tc: tc, gc: gc
+    };
+  }
+
+  // monthly
+  var allDs = Object.keys(D.days).sort();
+  if (!allDs.length) return null;
+  var seen2 = {}, months = [];
+  allDs.forEach(function(d) {
+    var k = d.slice(0, 7);
+    if (!seen2[k]) {
+      seen2[k] = true;
+      var dt = new Date(d + 'T12:00:00');
+      months.push({ y: dt.getFullYear(), m: dt.getMonth() });
+    }
+  });
+  var mss = months.map(function(x) { return monStats(x.y, x.m); }).filter(Boolean);
+  if (!mss.length) return null;
+  return {
+    labels: months.filter(function(_, i) { return mss[i]; }).map(function(x) {
+      return fmtMonth(x.y + '-' + String(x.m + 1).padStart(2, '0') + '-01');
+    }),
+    weight: mss.map(function(s) { return s.aW != null ? s.aW : null; }),
+    bf: mss.map(function(s) { return s.aBf != null ? s.aBf : null; }),
+    lean: mss.map(function(s) { return s.aLean != null ? +s.aLean.toFixed(2) : null; }),
+    calsIn: mss.map(function(s) { return s.aC ? Math.round(s.aC) : null; }),
+    maint: mss.map(function(s) { return s.mn ? Math.round(s.mn) : null; }),
+    steps: mss.map(function(s) { return s.aS ? Math.round(s.aS) : null; }),
+    tc: tc, gc: gc
+  };
+}
+
+function renderCharts() {
+  var cd = getChartData();
+  if (!cd) return;
+  var tc = cd.tc, gc = cd.gc;
+
+  function opts(yL) {
+    return {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { labels: { color: tc, font: { family: 'JetBrains Mono', size: 10 }, boxWidth: 10 } } },
+      scales: {
+        x: { grid: { color: gc }, ticks: { color: tc, font: { family: 'JetBrains Mono', size: 9 }, maxTicksLimit: 8 } },
+        y: { grid: { color: gc }, ticks: { color: tc, font: { family: 'JetBrains Mono', size: 9 } }, title: { display: !!yL, text: yL, color: tc, font: { size: 9 } } }
+      }
+    };
+  }
+
+  function mk(id, cfg) {
+    if (charts[id]) charts[id].destroy();
+    charts[id] = new Chart(document.getElementById('chart-' + id), cfg);
+  }
+
+  mk('weight', { type: 'line', data: { labels: cd.labels, datasets: [{ label: 'Weight (kg)', data: cd.weight, borderColor: '#f5d800', backgroundColor: 'rgba(245,216,0,0.07)', fill: true, tension: 0.3, pointRadius: 3, pointBackgroundColor: '#f5d800', spanGaps: true }] }, options: opts('kg') });
+  mk('lean',   { type: 'line', data: { labels: cd.labels, datasets: [{ label: 'Lean Mass (kg)', data: cd.lean, borderColor: '#34c85a', backgroundColor: 'rgba(52,200,90,0.07)', fill: true, tension: 0.3, pointRadius: 3, pointBackgroundColor: '#34c85a', spanGaps: true }] }, options: opts('kg') });
+  mk('bf',     { type: 'line', data: { labels: cd.labels, datasets: [{ label: 'Body Fat %', data: cd.bf, borderColor: '#f04444', backgroundColor: 'rgba(240,68,68,0.07)', fill: true, tension: 0.3, pointRadius: 3, pointBackgroundColor: '#f04444', spanGaps: true }] }, options: opts('%') });
+  mk('cals',   { type: 'bar',  data: { labels: cd.labels, datasets: [{ label: 'Intake (kcal)', data: cd.calsIn, backgroundColor: 'rgba(245,216,0,0.4)', borderRadius: 3 }, { label: 'Maintenance', data: cd.maint, type: 'line', borderColor: '#f04444', borderDash: [4, 4], backgroundColor: 'transparent', pointRadius: 2, pointBackgroundColor: '#f04444', spanGaps: true }] }, options: opts('kcal') });
+  mk('steps',  { type: 'bar',  data: { labels: cd.labels, datasets: [{ label: gran === 'daily' ? 'Steps' : 'Avg Daily Steps', data: cd.steps, backgroundColor: 'rgba(245,216,0,0.45)', borderRadius: 3 }] }, options: opts('steps') });
+}
+
+// ─── IMPORT / EXPORT ─────────────────────────────────────────────────────────
+function utcDateStr(d) {
+  return d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0') + '-' + String(d.getUTCDate()).padStart(2, '0');
+}
+
+function parseXlDate(val) {
+  if (!val) return null;
+  if (typeof val === 'number') return utcDateStr(new Date(Math.round((val - 25569) * 86400000) + 43200000));
+  if (val instanceof Date) return utcDateStr(val);
+  if (typeof val === 'string') {
+    val = val.trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+    var dmy = val.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
+    if (dmy) return dmy[3] + '-' + dmy[2].padStart(2, '0') + '-' + dmy[1].padStart(2, '0');
+    var p = new Date(val);
+    if (!isNaN(p)) return utcDateStr(p);
+  }
+  return null;
+}
+
+function detectColumns(headerRow) {
+  // Returns column indices for each field we need
+  // Priority: exact match over partial match; avoid computed/average columns
+  var h = headerRow.map(function(x) { return String(x || '').toLowerCase().trim(); });
+  
+  function findCol(keywords, excludeKeywords) {
+    // Try exact single-word match first
+    for (var i = 0; i < h.length; i++) {
+      var cell = h[i];
+      if (excludeKeywords && excludeKeywords.some(function(ex) { return cell.includes(ex); })) continue;
+      if (keywords.some(function(kw) { return cell === kw; })) return i;
+    }
+    // Then partial match
+    for (var i = 0; i < h.length; i++) {
+      var cell = h[i];
+      if (excludeKeywords && excludeKeywords.some(function(ex) { return cell.includes(ex); })) continue;
+      if (keywords.some(function(kw) { return cell.includes(kw); })) return i;
+    }
+    return -1;
+  }
+
+  return {
+    date:     findCol(['date'], ['weekly', 'avg']),
+    weight:   findCol(['kgs', 'kg', 'weight'], ['weekly', 'avg', 'target', 'lose', 'lost']),
+    calories: findCol(['calories intake', 'calorie intake', 'calories', 'cals'], ['weekly', 'avg', 'deficit', 'target']),
+    neck:     findCol(['neck'], ['weekly', 'avg']),
+    waist:    findCol(['waist'], ['weekly', 'avg']),
+    steps:    findCol(['steps walked', 'steps'], ['avg', 'weekly'])
+  };
+}
+
+function importExcel(ev) {
+  var file = ev.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var wb = XLSX.read(e.target.result, { type: 'array', cellDates: true });
+      var sheetName = wb.SheetNames.includes('FitTrack Data') ? 'FitTrack Data' : wb.SheetNames[0];
+      var rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { header: 1, defval: null, raw: false });
+
+      // Find header row (first row with 'date' in any cell)
+      var hIdx = 0;
+      for (var i = 0; i < Math.min(rows.length, 10); i++) {
+        var row = rows[i];
+        if (row && row.length >= 2) {
+          var cells = row.map(function(x) { return String(x || '').toLowerCase(); });
+          if (cells.some(function(x) { return x.includes('date'); })) { hIdx = i; break; }
+        }
+      }
+
+      var cols = detectColumns(rows[hIdx]);
+      var imp = 0;
+
+      for (var ri = hIdx + 1; ri < rows.length; ri++) {
+        var row = rows[ri];
+        if (!row || row.every(function(x) { return x === null || x === ''; })) continue;
+
+        var ds = cols.date >= 0 ? parseXlDate(row[cols.date]) : null;
+        if (!ds) continue;
+
+        var weight   = cols.weight   >= 0 ? parseFloat(row[cols.weight])   : NaN;
+        var calories = cols.calories >= 0 ? parseFloat(row[cols.calories]) : NaN;
+        var neck     = cols.neck     >= 0 ? parseFloat(row[cols.neck])     : NaN;
+        var waist    = cols.waist    >= 0 ? parseFloat(row[cols.waist])    : NaN;
+        var steps    = cols.steps    >= 0 ? parseFloat(row[cols.steps])    : NaN;
+
+        var hasAny = (!isNaN(weight) && weight > 0) || (!isNaN(calories) && calories > 0) ||
+                     (!isNaN(steps) && steps > 0) || (!isNaN(neck) && neck > 0) || (!isNaN(waist) && waist > 0);
+        if (!hasAny) continue;
+
+        var ex = D.days[ds] || {};
+        D.days[ds] = {
+          weight:   (!isNaN(weight)   && weight   > 0) ? weight   : (ex.weight   || null),
+          calories: (!isNaN(calories) && calories > 0) ? calories : (ex.calories || null),
+          neck:     (!isNaN(neck)     && neck     > 0) ? neck     : (ex.neck     || null),
+          waist:    (!isNaN(waist)    && waist    > 0) ? waist    : (ex.waist    || null),
+          steps:    (!isNaN(steps)    && steps    > 0) ? steps    : (ex.steps    || null)
+        };
+        imp++;
+      }
+
+      saveData(D);
+      toast('Imported ' + imp + ' day' + (imp !== 1 ? 's' : ''));
+      renderDash();
+    } catch(err) {
+      toast('Import failed: ' + err.message);
+      console.error(err);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+  ev.target.value = '';
+}
+window.importExcel = importExcel;
+
+function downloadTemplate() {
+  var wb = XLSX.utils.book_new();
+  var ws = XLSX.utils.aoa_to_sheet([
+    ['Date (DD/MM/YYYY)', 'Weight (kg)', 'Calorie Intake', 'Steps Walked', 'Neck (cm)', 'Waist (cm)'],
+    ['e.g. 01/03/2026',  'e.g. 70.5',  'e.g. 1800',      'e.g. 10500',  'e.g. 38.0', 'e.g. 95.0']
+  ].concat(Array.from({ length: 60 }, function() { return ['', '', '', '', '', '']; })));
+  ws['!cols'] = [{ wch: 20 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 12 }];
+  XLSX.utils.book_append_sheet(wb, ws, 'FitTrack Data');
+  XLSX.writeFile(wb, 'peak-physiq-template.xlsx');
+  toast('Template downloaded');
+}
+window.downloadTemplate = downloadTemplate;
+
+function exportExcel() {
+  var rows = [['Date', 'Day', 'Weight (kg)', 'Calories', 'Neck', 'Waist', 'BF%', 'Steps', 'Wkly Avg Wt', 'Wkly Avg BF%', 'Maintenance', 'Deficit Target', 'Wkly Deficit']];
+  allMondays().forEach(function(mon) {
+    var s = wkStats(mon);
+    var def = getWeekDeficit(mon);
+    s.days.forEach(function(d, i) {
+      var e = s.ents[i], b = s.bfs[i];
+      rows.push([
+        d, dayName(d),
+        e && e.weight ? e.weight : '',
+        e && e.calories ? e.calories : '',
+        e && e.neck ? e.neck : '',
+        e && e.waist ? e.waist : '',
+        b != null ? +b.toFixed(2) : '',
+        e && e.steps ? e.steps : '',
+        i === 0 && s.aW ? +s.aW.toFixed(2) : '',
+        i === 0 && s.aBf ? +s.aBf.toFixed(2) : '',
+        i === 0 && s.mn ? Math.round(s.mn) : '',
+        i === 0 ? def.val : '',
+        i === 0 && s.tDef != null ? Math.round(s.tDef) : ''
+      ]);
+    });
+  });
+  var ws = XLSX.utils.aoa_to_sheet(rows);
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Peak Physiq');
+  XLSX.writeFile(wb, 'peak-physiq-export.xlsx');
+  toast('Exported!');
+}
+window.exportExcel = exportExcel;
+
+// ─── DATE OFFSET ─────────────────────────────────────────────────────────────
+function openOffsetModal() {
+  document.getElementById('offset-days').value = 1;
+  updateOffsetPreview();
+  document.getElementById('offset-modal').classList.add('open');
+}
+window.openOffsetModal = openOffsetModal;
+
+function updateOffsetPreview() {
+  var n = parseInt(document.getElementById('offset-days').value) || 0;
+  var el = document.getElementById('offset-preview');
+  var ds = Object.keys(D.days).sort();
+  if (!ds.length) { el.textContent = 'No data to shift.'; return; }
+  var first = ds[0], last = ds[ds.length - 1];
+  el.innerHTML = 'Shifting ' + ds.length + ' entries by ' + (n > 0 ? '+' : '') + n + ' day(s).<br>' + fmtShort(first) + ' – ' + fmtShort(last) + ' &rarr; ' + fmtShort(addDays(first, n)) + ' – ' + fmtShort(addDays(last, n));
+}
+window.updateOffsetPreview = updateOffsetPreview;
+
+function applyOffset() {
+  var n = parseInt(document.getElementById('offset-days').value) || 0;
+  if (n === 0) { closeModal2('offset-modal'); return; }
+  var ds = Object.keys(D.days).sort();
+  if (!ds.length) { toast('No data'); closeModal2('offset-modal'); return; }
+  var ordered = n > 0 ? ds.slice().reverse() : ds;
+  var newDays = {};
+  ordered.forEach(function(d) { newDays[addDays(d, n)] = D.days[d]; });
+  var newWeeks = {};
+  Object.keys(D.weeks).forEach(function(m) { newWeeks[addDays(m, n)] = D.weeks[m]; });
+  D.days = newDays;
+  D.weeks = newWeeks;
+  saveData(D);
+  closeModal2('offset-modal');
+  toast('Shifted ' + ds.length + ' entries by ' + (n > 0 ? '+' : '') + n + 'd');
+  renderDash();
+  if (curView === 'history') renderHistory();
+  if (curView === 'weekly') renderLog();
+}
+window.applyOffset = applyOffset;
+
+// ─── DRAG AND DROP ───────────────────────────────────────────────────────────
+var dz = document.getElementById('drop-zone');
+if (dz) {
+  dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.classList.add('drag'); });
+  dz.addEventListener('dragleave', function() { dz.classList.remove('drag'); });
+  dz.addEventListener('drop', function(e) {
+    e.preventDefault(); dz.classList.remove('drag');
+    var f = e.dataTransfer.files[0];
+    if (f) {
+      var inp = document.getElementById('xl-in');
+      var dt = new DataTransfer();
+      dt.items.add(f);
+      inp.files = dt.files;
+      importExcel({ target: inp });
+    }
+  });
+}
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function() { t.classList.remove('show'); }, 2600);
+}
+
+// ─── SERVICE WORKER ──────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(function() {});
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+loadSettingsUI();
+renderDash();
+
+}); // end DOMContentLoaded
+</script>
+</body>
+</html>
