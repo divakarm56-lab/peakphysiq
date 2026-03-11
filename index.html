@@ -250,6 +250,25 @@ select option{background:var(--surface2);color:var(--text)}
 </style>
 </head>
 <body>
+<!-- AUTH SCREEN -->
+<div id="auth-screen" style="display:flex;position:fixed;inset:0;z-index:9999;background:var(--bg);align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;padding:2rem">
+  <div style="text-align:center;margin-bottom:.5rem">
+    <div style="font-family:var(--head);font-size:2.2rem;font-weight:800;color:var(--acc);letter-spacing:-.03em">&#9889; Peak Physiq</div>
+    <div style="color:var(--text2);font-size:.82rem;margin-top:.35rem;font-family:var(--mono)">Precision body composition tracker</div>
+  </div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:2rem;width:100%;max-width:360px;text-align:center;box-shadow:var(--sh)">
+    <div style="font-size:1rem;font-weight:700;margin-bottom:.5rem;font-family:var(--head)">Sign in to continue</div>
+    <div style="color:var(--text2);font-size:.76rem;margin-bottom:1.5rem;line-height:1.5">Your data is saved to the cloud and syncs across all your devices.</div>
+    <button onclick="signInWithGoogle()" style="display:flex;align-items:center;justify-content:center;gap:.75rem;width:100%;padding:.75rem 1rem;border-radius:calc(var(--r) - 2px);border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:var(--font);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .18s">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Continue with Google
+    </button>
+  </div>
+  <div style="color:var(--text2);font-size:.65rem;font-family:var(--mono);text-align:center;max-width:300px;line-height:1.6">Your data is private and only accessible with your Google account.</div>
+</div>
+
+<!-- APP SHELL -->
+<div id="app-shell" style="display:none;width:100%">
 <div class="shell">
 
 <!-- SIDEBAR -->
@@ -264,8 +283,16 @@ select option{background:var(--surface2);color:var(--text)}
     <button class="nav-btn" data-view="settings" onclick="go('settings')"><span class="ic">&#9881;</span>Settings</button>
   </div>
   <div class="sidebar-footer">
+    <div style="display:flex;align-items:center;gap:.6rem;padding:.4rem .5rem;margin-bottom:.2rem">
+      <img id="user-avatar" src="" style="display:none;width:28px;height:28px;border-radius:50%;flex-shrink:0" referrerpolicy="no-referrer">
+      <div style="min-width:0;flex:1">
+        <div id="user-name" style="font-size:.72rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+        <div id="user-email" style="font-size:.58rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--mono)"></div>
+      </div>
+    </div>
     <button class="btn btn-s btn-sm" id="theme-sidebar-btn" onclick="toggleTheme()" style="justify-content:flex-start;gap:.5rem"><span id="theme-icon">&#9728;&#65039;</span><span id="theme-lbl">Light Mode</span></button>
     <button class="btn btn-s btn-sm" id="sb-install-btn" onclick="installApp()" style="display:none;justify-content:flex-start;gap:.5rem">&#128242; Install App</button>
+    <button class="btn btn-d btn-sm" onclick="signOutUser()" style="justify-content:flex-start;gap:.5rem">&#128682; Sign Out</button>
   </div>
 </nav>
 
@@ -502,6 +529,18 @@ select option{background:var(--surface2);color:var(--text)}
   </div>
 
   <div class="ssec">
+    <div class="stitle">&#128100; Account</div>
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem">
+      <img id="settings-avatar" src="" style="display:none;width:40px;height:40px;border-radius:50%" referrerpolicy="no-referrer">
+      <div>
+        <div id="settings-name" style="font-size:.85rem;font-weight:600;color:var(--text)"></div>
+        <div id="settings-email" style="font-size:.72rem;color:var(--text2);font-family:var(--mono)"></div>
+      </div>
+    </div>
+    <button class="btn btn-d" onclick="signOutUser()">&#128682; Sign Out</button>
+  </div>
+
+  <div class="ssec">
     <div class="stitle" style="color:var(--danger)">&#9888; Danger Zone</div>
     <p class="tmuted gap-md">Permanently delete all logged entries. Settings are preserved.</p>
     <button class="btn btn-d" onclick="openClearModal()">Clear All Data</button>
@@ -521,6 +560,9 @@ select option{background:var(--surface2);color:var(--text)}
   <button class="bnav-btn" data-view="history"  onclick="go('history')"><span class="ic">&#128197;</span>History</button>
   <button class="bnav-btn" data-view="settings" onclick="go('settings')"><span class="ic">&#9881;</span>Settings</button>
 </nav>
+
+</div><!-- end .shell -->
+</div><!-- end #app-shell -->
 
 <!-- INSTALL BANNER -->
 <div id="install-banner">
@@ -604,7 +646,27 @@ select option{background:var(--surface2);color:var(--text)}
 
 <div id="toast"></div>
 
-<script>
+<script type="module">
+// ─── FIREBASE ────────────────────────────────────────────────────────────────
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, doc, getDoc, setDoc }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCsqOap-jEyQ3pw_GPctZDj2qHbX_8eyV0",
+  authDomain: "peak-physiq.firebaseapp.com",
+  projectId: "peak-physiq",
+  storageBucket: "peak-physiq.firebasestorage.app",
+  messagingSenderId: "822171819113",
+  appId: "1:822171819113:web:4dedc64870f9df3ea796f8"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const auth  = getAuth(fbApp);
+const db    = getFirestore(fbApp);
+
 // ═══════════════════════════════════════
 // ALL JS wrapped in DOMContentLoaded to guarantee DOM exists
 // ═══════════════════════════════════════
@@ -704,20 +766,7 @@ window.installApp = function() {
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 var SK = 'peak-physiq-v1';
-
-function loadData() {
-  try {
-    var d = JSON.parse(localStorage.getItem(SK));
-    if (!d) d = defaultData();
-    if (!d.weeks) d.weeks = {};
-    if (!d.settings) d.settings = defaultData().settings;
-    return d;
-  } catch(e) { return defaultData(); }
-}
-
-function saveData(d) {
-  localStorage.setItem(SK, JSON.stringify(d));
-}
+var currentUser = null;
 
 function defaultData() {
   return {
@@ -727,7 +776,68 @@ function defaultData() {
   };
 }
 
-var D = loadData();
+function migrateLocal() {
+  // Pull any existing localStorage data to migrate to cloud on first login
+  try {
+    var raw = localStorage.getItem(SK);
+    if (!raw) return null;
+    var d = JSON.parse(raw);
+    if (!d || (!Object.keys(d.days || {}).length && !d.settings.starter)) return null;
+    return d;
+  } catch(e) { return null; }
+}
+
+async function loadData() {
+  if (!currentUser) {
+    // Not logged in — use localStorage as fallback
+    try {
+      var d = JSON.parse(localStorage.getItem(SK));
+      if (!d) d = defaultData();
+      if (!d.weeks) d.weeks = {};
+      return d;
+    } catch(e) { return defaultData(); }
+  }
+  try {
+    var ref = doc(db, 'users', currentUser.uid);
+    var snap = await getDoc(ref);
+    if (snap.exists()) {
+      var d = snap.data().data || defaultData();
+      if (!d.weeks) d.weeks = {};
+      if (!d.settings) d.settings = defaultData().settings;
+      return d;
+    } else {
+      // First login — check for local data to migrate
+      var local = migrateLocal();
+      var d = local || defaultData();
+      if (!d.weeks) d.weeks = {};
+      await setDoc(ref, { data: d, uid: currentUser.uid, email: currentUser.email });
+      if (local) {
+        localStorage.removeItem(SK);
+        toast('Local data migrated to cloud!');
+      }
+      return d;
+    }
+  } catch(e) {
+    console.error('Firestore load error:', e);
+    return defaultData();
+  }
+}
+
+function saveData(d) {
+  if (currentUser) {
+    // Save to Firestore
+    var ref = doc(db, 'users', currentUser.uid);
+    setDoc(ref, { data: d, uid: currentUser.uid, email: currentUser.email }).catch(function(e) {
+      console.error('Firestore save error:', e);
+      toast('Save error — check connection');
+    });
+  } else {
+    // Fallback to localStorage if not signed in
+    localStorage.setItem(SK, JSON.stringify(d));
+  }
+}
+
+var D = defaultData(); // Will be replaced after auth resolves
 
 // ─── DATE UTILS ──────────────────────────────────────────────────────────────
 function todayStr() { return new Date().toISOString().slice(0, 10); }
@@ -1377,6 +1487,15 @@ function renderHistory() {
 // ─── SETTINGS ────────────────────────────────────────────────────────────────
 function loadSettingsUI() {
   var s = D.settings;
+  // Populate account section in settings
+  if (currentUser) {
+    var sName = document.getElementById('settings-name');
+    var sEmail = document.getElementById('settings-email');
+    var sAvatar = document.getElementById('settings-avatar');
+    if (sName) sName.textContent = currentUser.displayName || 'User';
+    if (sEmail) sEmail.textContent = currentUser.email;
+    if (sAvatar && currentUser.photoURL) { sAvatar.src = currentUser.photoURL; sAvatar.style.display = 'block'; }
+  }
   document.getElementById('s-height').value = s.height || 172.5;
   document.getElementById('s-target').value = s.targetWeight || 65;
   document.getElementById('s-activity').value = s.activityFactor || 1.4;
@@ -1800,9 +1919,54 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(function() {});
 }
 
-// ─── INIT ────────────────────────────────────────────────────────────────────
-loadSettingsUI();
-renderDash();
+// ─── AUTH STATE ──────────────────────────────────────────────────────────────
+function showAuthScreen() {
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app-shell').style.display = 'none';
+}
+
+function hideAuthScreen() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-shell').style.display = 'flex';
+}
+
+window.signInWithGoogle = function() {
+  var provider = new GoogleAuthProvider();
+  signInWithPopup(auth, provider).catch(function(e) {
+    toast('Sign-in failed: ' + e.message);
+  });
+};
+
+window.signOutUser = function() {
+  signOut(auth).then(function() {
+    D = defaultData();
+    showAuthScreen();
+    toast('Signed out');
+  });
+};
+
+onAuthStateChanged(auth, async function(user) {
+  currentUser = user;
+  if (user) {
+    // Update user info in sidebar
+    var nameEl = document.getElementById('user-name');
+    var emailEl = document.getElementById('user-email');
+    var avatarEl = document.getElementById('user-avatar');
+    if (nameEl) nameEl.textContent = user.displayName || 'User';
+    if (emailEl) emailEl.textContent = user.email;
+    if (avatarEl && user.photoURL) {
+      avatarEl.src = user.photoURL;
+      avatarEl.style.display = 'block';
+    }
+    // Load data then render
+    D = await loadData();
+    hideAuthScreen();
+    loadSettingsUI();
+    renderDash();
+  } else {
+    showAuthScreen();
+  }
+});
 
 }); // end DOMContentLoaded
 </script>
