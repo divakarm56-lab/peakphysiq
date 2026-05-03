@@ -380,9 +380,9 @@ tr:hover td { background: var(--bg3); }
   <div class="auth-card">
     <h2>Sign in to continue</h2>
     <p style="font-size:13px;color:var(--text2);">Your data syncs across all devices via Firebase.</p>
-    <button class="google-btn" onclick="signInWithGoogle()">
+    <button class="google-btn" id="google-signin-btn" onclick="handleSignIn(this)">
       <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 002.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 01-7.18-2.54H1.83v2.07A8 8 0 008.98 17z"/><path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 010-3.04V5.41H1.83a8 8 0 000 7.18l2.67-2.07z"/><path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 001.83 5.4L4.5 7.49a4.77 4.77 0 014.48-3.3z"/></svg>
-      Continue with Google
+      <span id="signin-label">Continue with Google</span>
     </button>
     <p id="auth-error" style="font-size:12px;color:var(--red);display:none;"></p>
   </div>
@@ -462,7 +462,7 @@ tr:hover td { background: var(--bg3); }
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ─── FIREBASE CONFIG ───
@@ -496,14 +496,18 @@ let sessionTimerInterval = null;
 let workoutActiveTab = 'log';
 
 // ─── AUTH ───
-window.signInWithGoogle = async () => {
+window.handleSignIn = async (btn) => {
+  const label = document.getElementById('signin-label');
+  if (label) label.textContent = 'Redirecting to Google…';
+  if (btn) btn.disabled = true;
   const provider = new GoogleAuthProvider();
   try {
-    await signInWithPopup(auth, provider);
+    await signInWithRedirect(auth, provider);
   } catch(e) {
-    document.getElementById('auth-error').textContent = 'Sign-in failed: ' + e.message;
-    document.getElementById('auth-error').style.display = 'block';
-    showToast('Sign-in failed');
+    const errEl = document.getElementById('auth-error');
+    if (errEl) { errEl.textContent = 'Sign-in failed: ' + e.message; errEl.style.display = 'block'; }
+    if (label) label.textContent = 'Continue with Google';
+    if (btn) btn.disabled = false;
   }
 };
 window.signOut = async () => {
@@ -511,6 +515,17 @@ window.signOut = async () => {
 };
 
 onAuthStateChanged(auth, async user => {
+  // Handle redirect result first
+  try {
+    const result = await getRedirectResult(auth);
+    if (result?.user) {
+      // redirect completed, onAuthStateChanged will fire again with user
+    }
+  } catch(e) {
+    const errEl = document.getElementById('auth-error');
+    if (errEl) { errEl.textContent = 'Sign-in failed: ' + e.message; errEl.style.display = 'block'; }
+  }
+
   if (user) {
     currentUser = user;
     document.getElementById('auth-screen').style.display = 'none';
@@ -896,7 +911,8 @@ function getWeekWeightChange() {
   const cur=avg(days), prev=avg(prevDays);
   if (!cur||!prev) return 'No prior week data';
   const diff=cur-prev;
-  return `<span style="color:${diff>0?'var(--red)':'var(--green)}">${diff>0?'+':''}${fmt(diff)}kg vs last week</span>`;
+  const diffColor=diff>0?'var(--red)':'var(--green)';
+  return `<span style="color:${diffColor}">${diff>0?'+':''}${fmt(diff)}kg vs last week</span>`;
 }
 function getRemaining() {
   const days=weekDays(currentWeekStart);
@@ -932,7 +948,9 @@ function updateLiveCalc() {
   if (!bf&&!maint) { el.classList.remove('show'); return; }
   const delta=maint&&c?c-maint:null;
   el.classList.add('show');
-  el.innerHTML=`<div class="live-calc-row"><span>Body Fat</span><span>${bf?fmt(bf)+'%':'—'}</span></div><div class="live-calc-row"><span>Maintenance</span><span>${maint?Math.round(maint)+' kcal':'—'}</span></div>${delta!=null?`<div class="live-calc-row"><span>vs Maintenance</span><span style="color:${delta<0?'var(--green)':'var(--red)}">${delta>0?'+':''}${Math.round(delta)} kcal</span></div>`:''}`;
+  const _dc=delta!=null?(delta<0?'var(--green)':'var(--red)'):'';
+  const _dh=delta!=null?('<div class="live-calc-row"><span>vs Maintenance</span><span style="color:'+_dc+'">'+(delta>0?'+':'')+Math.round(delta)+' kcal</span></div>'):'';
+  el.innerHTML=`<div class="live-calc-row"><span>Body Fat</span><span>${bf?fmt(bf)+'%':'—'}</span></div><div class="live-calc-row"><span>Maintenance</span><span>${maint?Math.round(maint)+' kcal':'—'}</span></div>`+_dh;
 }
 window.saveToday = async function() {
   const today=dateStr(new Date());
@@ -1187,7 +1205,7 @@ function renderHistory(el) {
       const stats=getWeekStats(days);
       const prev=allMondays[i+1];
       let change='';
-      if (prev) { const ps=getWeekStats(weekDays(parseDate(prev))); if(ps.avgWeight&&stats.avgWeight){ const d=stats.avgWeight-ps.avgWeight; change=`<span style="color:${d>0?'var(--red)':'var(--green)};margin-left:8px;">${d>0?'+':''}${fmt(d)}kg</span>`; } }
+      if (prev) { const ps=getWeekStats(weekDays(parseDate(prev))); if(ps.avgWeight&&stats.avgWeight){ const d=stats.avgWeight-ps.avgWeight; const dc=d>0?'var(--red)':'var(--green)'; change=`<span style="color:${dc};margin-left:8px;">${d>0?'+':''}${fmt(d)}kg</span>`; } }
       const wn=getWeekNumber(m);
       return `<div class="history-session" id="hist-${m}">
         <div class="history-session-header" onclick="toggleHist('${m}')">
