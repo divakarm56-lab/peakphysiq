@@ -125,13 +125,6 @@ select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xml
 .pill-tab{flex:1;min-width:60px;padding:5px 10px;border-radius:4px;font-size:12px;font-weight:600;background:none;border:none;color:var(--text3);transition:all 0.15s;cursor:pointer;white-space:nowrap;}
 .pill-tab.active{background:var(--accent);color:#000;}
 
-.cycle-day{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.15s;border:2px solid transparent;}
-.cycle-day.period{background:rgba(236,72,153,0.25);border-color:var(--pink);color:var(--pink);}
-.cycle-day.fertile{background:rgba(34,197,94,0.2);border-color:var(--green);color:var(--green);}
-.cycle-day.ovulation{background:rgba(168,85,247,0.3);border-color:var(--purple);color:var(--purple);}
-.cycle-day.pms{background:rgba(249,115,22,0.2);border-color:var(--orange);color:var(--orange);}
-.cycle-day.today-ring{box-shadow:0 0 0 2px var(--accent);}
-.cycle-grid{display:flex;flex-wrap:wrap;gap:4px;margin-top:12px;}
 .symptom-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:100px;font-size:11px;font-weight:600;margin:3px;cursor:pointer;transition:all 0.15s;}
 .supp-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
 .supp-item:last-child{border-bottom:none;}
@@ -231,6 +224,58 @@ tr:hover td{background:var(--bg3);}
 @media(max-width:400px){
   .grid-3,.grid-2,.grid-4{grid-template-columns:1fr;}
 }
+
+/* Measurement guide */
+.ms-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+@media(max-width:400px){.ms-grid{grid-template-columns:1fr;}}
+.ms-field-wrap{position:relative;}
+.ms-guide-btn{width:18px;height:18px;border-radius:50%;background:var(--bg4);border:1px solid var(--border);
+  color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;
+  justify-content:center;transition:all 0.15s;flex-shrink:0;}
+.ms-guide-btn:hover{background:var(--accent);color:#000;border-color:var(--accent);}
+.ms-guide-wrap{position:relative;display:inline-block;}
+.ms-guide-popup{position:absolute;left:0;top:26px;width:220px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:12px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,0.4);
+  display:none;pointer-events:auto;}
+.ms-guide-popup.open{display:block;}
+@media(max-width:500px){.ms-guide-popup{left:auto;right:0;}}
+/* Compact photo grid */
+.photo-compact-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:4px;}
+.photo-compact-card{position:relative;border-radius:var(--radius-sm);overflow:hidden;background:var(--bg2);
+  border:1px solid var(--border);cursor:pointer;}
+.photo-compact-img{width:100%;aspect-ratio:1;object-fit:cover;display:block;transition:opacity 0.15s;}
+.photo-compact-img:hover{opacity:0.85;}
+.photo-compact-label{font-size:11px;color:var(--text2);padding:4px 6px;text-align:center;background:var(--bg3);}
+.photo-compact-del{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;
+  width:20px;height:20px;color:#fff;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.15s;}
+.photo-compact-card:hover .photo-compact-del{opacity:1;}
+@media(max-width:600px){.photo-compact-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));}}
+
+/* MFP Nutrition styles */
+.mfp-cal-bar{display:flex;align-items:center;justify-content:center;gap:0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+.mfp-cal-item{text-align:center;min-width:70px;}
+.mfp-cal-label{font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);margin-bottom:4px;}
+.mfp-cal-value{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:600;}
+.mfp-cal-op{font-size:20px;color:var(--text3);padding:0 8px;align-self:center;}
+.mfp-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden;}
+.mfp-section-header{display:flex;align-items:center;padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);gap:8px;}
+/* Swipeable food row */
+.mfp-food-row-wrap{position:relative;overflow:hidden;border-bottom:1px solid var(--border);}
+.mfp-food-row-wrap:last-of-type{border-bottom:none;}
+.mfp-food-row-reveal{position:absolute;right:0;top:0;bottom:0;width:64px;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;border-radius:0;transition:opacity 0.15s;pointer-events:none;}
+.mfp-food-row{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--bg2);position:relative;touch-action:pan-y;transition:transform 0.2s;}
+.mfp-food-row:last-of-type{}
+/* Swipeable empty-section area */
+.mfp-empty-swipe{position:relative;overflow:hidden;}
+.mfp-empty-swipe-reveal{position:absolute;left:0;top:0;bottom:0;width:100%;background:rgba(34,197,94,0.1);display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:600;color:var(--green);opacity:0;transition:opacity 0.15s;pointer-events:none;border-radius:var(--radius-sm);}
+/* Floating add icon per section */
+.mfp-section-fab{position:absolute;bottom:8px;right:8px;width:32px;height:32px;border-radius:50%;background:var(--accent);color:#000;border:none;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);opacity:0;transition:opacity 0.15s;z-index:2;}
+.mfp-section:hover .mfp-section-fab,.mfp-section:focus-within .mfp-section-fab{opacity:1;}
+@media(max-width:900px){.mfp-section-fab{opacity:1;}}
+.mfp-section-totals{display:flex;gap:16px;padding:8px 14px;background:var(--bg3);font-size:11px;font-weight:600;color:var(--text2);border-top:1px solid var(--border);}
+.mfp-daily-totals{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.mfp-totals-row{display:flex;gap:16px;padding:10px 14px;font-size:12px;border-bottom:1px solid var(--border);}
+.mfp-totals-row:last-child{border-bottom:none;}
 </style>
 </head>
 <body>
@@ -276,21 +321,19 @@ tr:hover td{background:var(--bg3);}
     <div class="nav-section">
       <div class="nav-group-label">Overview</div>
       <button class="nav-btn" onclick="navigate('dashboard')"><span class="nav-icon">📊</span> Dashboard</button>
-      <button class="nav-btn" onclick="navigate('weekly')"><span class="nav-icon">📅</span> Weekly</button>
-      <button class="nav-btn" onclick="navigate('monthly')"><span class="nav-icon">🗓️</span> Monthly</button>
+      <button class="nav-btn" onclick="navigate('overview')"><span class="nav-icon">📅</span> Overview</button>
       <button class="nav-btn" onclick="navigate('charts')"><span class="nav-icon">📈</span> Charts</button>
-      <button class="nav-btn" onclick="navigate('history')"><span class="nav-icon">🗂️</span> History</button>
       <div class="nav-group-label">Tracking</div>
       <button class="nav-btn" id="nav-nutrition" onclick="navigate('nutrition')"><span class="nav-icon">🥗</span> Nutrition</button>
       <button class="nav-btn" id="nav-supplements" onclick="navigate('supplements')"><span class="nav-icon">💊</span> Supplements</button>
       <button class="nav-btn" id="nav-measurements" onclick="navigate('measurements')"><span class="nav-icon">📏</span> Measurements</button>
       <button class="nav-btn" id="nav-photos" onclick="navigate('photos')"><span class="nav-icon">📸</span> Progress Photos</button>
-      <button class="nav-btn" id="cycle-nav-btn" onclick="navigate('cycle')" style="display:none;"><span class="nav-icon">🌸</span> Cycle</button>
       <div class="nav-group-label">Insights</div>
       <button class="nav-btn" onclick="navigate('insights')"><span class="nav-icon">🔍</span> Insights</button>
       <div class="nav-group-label">Account</div>
       <button class="nav-btn" onclick="navigate('profile')"><span class="nav-icon">👤</span> Profile</button>
       <button class="nav-btn" onclick="navigate('settings')"><span class="nav-icon">⚙️</span> Settings</button>
+      <button class="nav-btn" onclick="navigate('history')"><span class="nav-icon">🗂️</span> History</button>
     </div>
     <div class="sidebar-footer">
       <div class="user-info">
@@ -309,15 +352,13 @@ tr:hover td{background:var(--bg3);}
   <main id="main">
     <div id="content">
       <div id="view-dashboard"></div>
-      <div id="view-weekly" style="display:none;"></div>
-      <div id="view-monthly" style="display:none;"></div>
+      <div id="view-overview" style="display:none;"></div>
       <div id="view-charts" style="display:none;"></div>
       <div id="view-history" style="display:none;"></div>
       <div id="view-nutrition" style="display:none;"></div>
       <div id="view-supplements" style="display:none;"></div>
       <div id="view-measurements" style="display:none;"></div>
       <div id="view-photos" style="display:none;"></div>
-      <div id="view-cycle" style="display:none;"></div>
       <div id="view-insights" style="display:none;"></div>
       <div id="view-profile" style="display:none;"></div>
       <div id="view-settings" style="display:none;"></div>
@@ -326,13 +367,14 @@ tr:hover td{background:var(--bg3);}
   <nav id="bottom-nav">
     <div class="bnav-inner">
       <button class="bnav-btn" onclick="navigate('dashboard')"><span class="nav-icon">📊</span><span>Dash</span></button>
+      <button class="bnav-btn" onclick="navigate('overview')"><span class="nav-icon">📅</span><span>Week</span></button>
       <button class="bnav-btn" id="bnav-nutrition" onclick="navigate('nutrition')"><span class="nav-icon">🥗</span><span>Food</span></button>
       <button class="bnav-btn" id="bnav-supplements" onclick="navigate('supplements')"><span class="nav-icon">💊</span><span>Supps</span></button>
       <button class="bnav-btn" id="bnav-measurements" onclick="navigate('measurements')"><span class="nav-icon">📏</span><span>Body</span></button>
       <button class="bnav-btn" id="bnav-photos" onclick="navigate('photos')"><span class="nav-icon">📸</span><span>Photos</span></button>
-      <button class="bnav-btn" id="cycle-bnav-btn" onclick="navigate('cycle')" style="display:none;"><span class="nav-icon">🌸</span><span>Cycle</span></button>
       <button class="bnav-btn" onclick="navigate('insights')"><span class="nav-icon">🔍</span><span>Insights</span></button>
       <button class="bnav-btn" onclick="navigate('settings')"><span class="nav-icon">⚙️</span><span>Settings</span></button>
+      <button class="bnav-btn" onclick="navigate('history')"><span class="nav-icon">🗂️</span><span>History</span></button>
     </div>
   </nav>
 </div>
@@ -369,6 +411,7 @@ let currentWeekStart = getMonday(new Date());
 let currentMonth = new Date();
 let charts = {};
 let gran = 'week';
+let nutritionDate = null; // null = today
 let deferredInstall = null;
 let saveDebounceTimer = null;
 
@@ -379,19 +422,19 @@ let data = {
     starter:{weight:null,neck:null,waist:null},
     name:'',dob:null,gender:'prefer-not',units:'metric',
     trackCalories:true,trackSupplements:true,
-    trackMeasurements:true,trackCycle:true,
+    trackMeasurements:true,
     theme:'dark',
 
     trialStart:null,subscriptionStatus:'trial',plan:'monthly',
     streakDays:0,lastLogDate:null,
     dailyCalGoal:2000,proteinGoal:150,carbGoal:200,fatGoal:65,
-    savedMeals:[]
+    savedMeals:[],
+    mealSections:null  // null = use defaults, array of {id,name} if customised
   },
   days:{},weeks:{},
   nutrition:{},
   supplements:{list:[],log:{}},
   measurements:{},
-  cycle:{periodStart:null,cycleLength:28,periodLength:5,log:{}},
   photos:{}  // date → {url: base64, notes:''}
 };
 
@@ -675,7 +718,6 @@ function mergeData(d){
     nutrition:d.nutrition||{},
     supplements:d.supplements||{list:[],log:{}},
     measurements:d.measurements||{},
-    cycle:d.cycle||{periodStart:null,cycleLength:28,periodLength:5,log:{}},
     photos:d.photos||{}
   };
   if(!data.settings.savedMeals) data.settings.savedMeals=[];
@@ -720,7 +762,6 @@ function scheduleAutoBackup(){
 }
 
 // ─── NAV VISIBILITY (dynamic based on feature toggles) ─────
-function updateCycleVisibility(){ updateNavVisibility(); } // compat alias
 function updateNavVisibility(){
   // Feature toggle → nav visibility map
   const map = {
@@ -741,17 +782,11 @@ function updateNavVisibility(){
     }
   });
   // Photos always visible (no toggle for it)
-  // Cycle: gender + toggle
-  const showCycle = data.settings.gender !== 'male' && data.settings.trackCycle !== false;
-  ['cycle-nav-btn','cycle-bnav-btn'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = showCycle ? '' : 'none';
-  });
-  if (!showCycle && currentView === 'cycle') navigate('dashboard');
 }
 
 // ─── NAVIGATION ────────────────────────────────────────────
 window.navigate=function(view){
+  if(view!=='nutrition') nutritionDate=null; // reset to today when leaving
   currentView=view;
   document.querySelectorAll('.nav-btn,.bnav-btn').forEach(b=>
     b.classList.toggle('active',b.getAttribute('onclick')==="navigate('"+view+"')")
@@ -767,30 +802,29 @@ function renderView(v){
   const el=document.getElementById('view-'+v);
   if(!el) return;
   if(v==='dashboard')    renderDashboard(el);
-  else if(v==='weekly')       renderWeekly(el);
-  else if(v==='monthly')      renderMonthly(el);
+  else if(v==='overview')     renderOverview(el);
   else if(v==='charts')       renderCharts(el);
   else if(v==='history')      renderHistory(el);
   else if(v==='nutrition')    renderNutrition(el);
   else if(v==='supplements')  renderSupplements(el);
   else if(v==='measurements') renderMeasurements(el);
   else if(v==='photos')       renderPhotos(el);
-  else if(v==='cycle')        renderCycle(el);
   else if(v==='insights')     renderInsights(el);
   else if(v==='profile')      renderProfile(el);
   else if(v==='settings')     renderSettings(el);
 }
 
 // ─── UTILS ─────────────────────────────────────────────────
-function fmt(v,d=1){return(v==null||isNaN(v))?'—':(+v).toFixed(d);}
-function dateStr(d){return d.toISOString().slice(0,10);}
+function fmt(v,d=2){return(v==null||isNaN(v))?'—':(+v).toFixed(d);}
+function dateStr(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${dd}`;}
 function parseDate(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);}
 function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
 function getMonday(d){const day=d.getDay(),diff=d.getDate()-day+(day===0?-6:1);return new Date(new Date(d).setDate(diff));}
 function weekDays(mon){return Array.from({length:7},(_,i)=>dateStr(addDays(mon,i)));}
 function getDayName(s){return parseDate(s).toLocaleDateString('en-GB',{weekday:'short'});}
-function fmtShort(s){return parseDate(s).toLocaleDateString('en-GB',{day:'numeric',month:'short'});}
-function fmtFull(s){return parseDate(s).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
+function ordinal(n){const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);}
+function fmtShort(s){const d=parseDate(s);return ordinal(d.getDate())+' '+d.toLocaleDateString('en-GB',{month:'long'})+', '+d.getFullYear();}
+function fmtFull(s){const d=parseDate(s);return ordinal(d.getDate())+' '+d.toLocaleDateString('en-GB',{month:'long',year:'numeric'});}
 function weekRange(mon){return fmtShort(dateStr(mon))+' – '+fmtShort(dateStr(addDays(mon,6)));}
 function calcAge(dob){if(!dob) return null;const d=parseDate(dob);const now=new Date();let age=now.getFullYear()-d.getFullYear();if(now<new Date(now.getFullYear(),d.getMonth(),d.getDate()))age--;return age;}
 function uid(){return Math.random().toString(36).slice(2,9);}
@@ -924,7 +958,7 @@ function renderDashboard(el){
   el.innerHTML=`
     ${trialBannerHtml()}
     <div class="page-title">Dashboard ${streakHtml()}</div>
-    ${!hasAnyData?`<div class="empty-state" style="margin-bottom:16px;padding:24px;"><div class="empty-state-icon">👋</div><div class="empty-state-title">Welcome, ${data.settings.name||'there'}!</div><div class="empty-state-sub">Log your first entry below to get started. You need height, neck, and waist measurements to calculate body fat %.</div></div>`:''}
+    ${(!hasAnyData && data.settings.trialStart===dateStr(new Date()))?`<div class="empty-state" style="margin-bottom:16px;padding:24px;"><div class="empty-state-icon">👋</div><div class="empty-state-title">Welcome, ${data.settings.name||'there'}!</div><div class="empty-state-sub">Log your first entry below to get started. You need height, neck, and waist measurements to calculate body fat %.</div></div>`:''}
     ${projDate?`<div class="projection-card"><div style="font-size:12px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">📍 Goal Projection</div><div style="font-size:15px;font-weight:600;margin-top:4px;">At current rate → <span style="color:var(--accent);">${fmtShort(projDate)}</span> &middot; ${Math.round((parseDate(projDate)-new Date())/86400000)} days to ${fmtWeight(data.settings.targetWeight)}</div></div>`:''}
     <div class="period-nav">
       <div class="period-toggle">
@@ -938,16 +972,25 @@ function renderDashboard(el){
     </div>
     ${buildSummaryBar()}
     <div class="grid-2" style="margin-bottom:12px;">
-      ${statCard('Current Weight',fmtWeight(e.weight),weekWeightChange())}
-      ${statCard('Target Weight',fmtWeight(data.settings.targetWeight),remaining())}
+      <div class="card">
+        <div class="card-title">Weight</div>
+        <div class="card-value">${fmtWeight(e.weight)}</div>
+        <div class="card-sub">${weekWeightChange()}</div>
+        <div style="margin-top:6px;font-size:11px;color:var(--text3);">Target: ${fmtWeight(data.settings.targetWeight)} · ${remaining()}</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Body Comp</div>
+        <div class="card-value">${(()=>{const s=getWeekStats(weekDays(currentWeekStart));return s.avgBF?fmt(s.avgBF)+'%':'—';})()}</div>
+        <div class="card-sub">BF · Lean: ${(()=>{const s=getWeekStats(weekDays(currentWeekStart));return fmtWeight(s.avgLean);})()}</div>
+      </div>
     </div>
-    <div class="grid-2" style="margin-bottom:12px;">
-      ${deficitCard()} ${leanCard()}
-    </div>
-    ${data.settings.trackCalories!==false?`<div class="card" style="margin-bottom:12px;">
-      <div class="card-title">Protein Today</div>
-      <div class="card-value">${todayN.protein?Math.round(todayN.protein):'—'}<span style="font-size:13px;color:var(--text3);"> g</span></div>
-      <div class="card-sub">Cal: ${todayN.totalCal?Math.round(todayN.totalCal):'—'} · C: ${todayN.carbs?Math.round(todayN.carbs):'—'}g · F: ${todayN.fat?Math.round(todayN.fat):'—'}g</div>
+    ${(data.settings.trackCalories!==false||data.settings.trackMeasurements!==false)?`<div class="grid-2" style="margin-bottom:12px;">
+      ${deficitCard()}
+      ${data.settings.trackCalories!==false?`<div class="card">
+        <div class="card-title">Today · Nutrition</div>
+        <div class="card-value" style="font-size:18px;">${todayN.totalCal?Math.round(todayN.totalCal):'—'}<span style="font-size:11px;color:var(--text3);"> kcal</span></div>
+        <div class="card-sub">P: ${todayN.protein?Math.round(todayN.protein):'—'}g · C: ${todayN.carbs?Math.round(todayN.carbs):'—'}g · F: ${todayN.fat?Math.round(todayN.fat):'—'}g</div>
+      </div>`:leanCard()}
     </div>`:''}
     <div class="card">
       <div class="section-title">Today's Entry</div>
@@ -1083,25 +1126,93 @@ window.saveToday=async()=>{
   if(w) entry.weight=w;if(c) entry.calories=c;if(s) entry.steps=s;if(n) entry.neck=n;if(wa) entry.waist=wa;
   if(!Object.keys(entry).length){showToast('Nothing to save');return;}
   data.days[today]={...(data.days[today]||{}),...entry};
+  // Always sync to measurements store regardless of toggle
+  const msEntry={...(data.measurements[today]||{})};
+  if(w) msEntry.weight=w;
+  if(n) msEntry.neck=n;
+  if(wa) msEntry.waist=wa;
+  if(w||n||wa) data.measurements[today]=msEntry;
   stampDeficit(getMonday(new Date()));
   updateStreak();
   await saveData();showOk('ok-today');showToast('Saved!');
 };
-// ─── WEEKLY ────────────────────────────────────────────────
-function renderWeekly(el){
+window.openEdit=d=>{
+  const e=data.days[d]||{};
+  const metric=isMetric();
+  const wDisp=e.weight?(metric?fmt(e.weight):fmt(e.weight*2.20462)):'';
+  const nDisp=e.neck?(metric?fmt(e.neck):fmt(e.neck*0.393701)):'';
+  const waDisp=e.waist?(metric?fmt(e.waist):fmt(e.waist*0.393701)):'';
+  const wUnit=metric?'kg':'lb';const lUnit=metric?'cm':'in';
+  document.getElementById('modal-container').innerHTML=`
+    <div class="modal-backdrop" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <div class="modal-title">Edit · ${fmtShort(d)}</div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div class="form-group"><label>Weight (${wUnit})</label><input class="input" id="ed-w" type="number" step="0.1" placeholder="—" value="${wDisp}"></div>
+        <div class="form-group"><label>Calories (kcal)</label><input class="input" id="ed-c" type="number" placeholder="—" value="${e.calories||''}"></div>
+        <div class="form-group"><label>Steps</label><input class="input" id="ed-s" type="number" placeholder="—" value="${e.steps||''}"></div>
+        <div class="grid-2">
+          <div class="form-group"><label>Neck (${lUnit})</label><input class="input" id="ed-n" type="number" step="0.1" placeholder="—" value="${nDisp}"></div>
+          <div class="form-group"><label>Waist (${lUnit})</label><input class="input" id="ed-wa" type="number" step="0.1" placeholder="—" value="${waDisp}"></div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveEdit('${d}')">Save</button>
+        </div>
+      </div>
+    </div>`;
+};
+window.saveEdit=async d=>{
+  const metric=isMetric();
+  const wRaw=parseFloat(document.getElementById('ed-w')?.value)||null;
+  const w=wRaw?(metric?wRaw:wRaw/2.20462):null;
+  const c=parseFloat(document.getElementById('ed-c')?.value)||null;
+  const s=parseFloat(document.getElementById('ed-s')?.value)||null;
+  const nRaw=parseFloat(document.getElementById('ed-n')?.value)||null;
+  const n=nRaw?(metric?nRaw:nRaw/0.393701):null;
+  const waRaw=parseFloat(document.getElementById('ed-wa')?.value)||null;
+  const wa=waRaw?(metric?waRaw:waRaw/0.393701):null;
+  const entry={...(data.days[d]||{})};
+  if(w) entry.weight=w; else delete entry.weight;
+  if(c) entry.calories=c; else delete entry.calories;
+  if(s) entry.steps=s; else delete entry.steps;
+  if(n) entry.neck=n; else delete entry.neck;
+  if(wa) entry.waist=wa; else delete entry.waist;
+  data.days[d]=entry;
+  const ms={...(data.measurements[d]||{})};
+  if(w) ms.weight=w; if(n) ms.neck=n; if(wa) ms.waist=wa;
+  if(w||n||wa) data.measurements[d]=ms;
+  stampDeficit(getMonday(parseDate(d)));
+  await saveData();closeModal();renderView(currentView);showToast('Entry updated!');
+};
+// ─── OVERVIEW (weekly + monthly combined) ─────────────────
+let overviewMode = 'weekly'; // 'weekly' | 'monthly'
+
+function renderOverview(el){
+  if(overviewMode==='weekly') renderOverviewWeekly(el);
+  else renderOverviewMonthly(el);
+}
+
+function renderOverviewWeekly(el){
   const days=weekDays(currentWeekStart);
   const stats=getWeekStats(days);
   const monKey=dateStr(currentWeekStart);
   const locked=data.weeks[monKey]?.deficitTarget!=null;
   const defVal=getDeficit(currentWeekStart);
   const today=dateStr(new Date());
+  const tm=data.settings.trackMeasurements!==false;
+  const tc=data.settings.trackCalories!==false;
   el.innerHTML=`
-    <div class="page-title">Weekly</div>
-    <div class="period-nav">
+    <div class="page-title">Overview</div>
+    <div class="period-nav" style="margin-bottom:12px;">
+      <div class="period-toggle">
+        <button class="ptoggle-btn ${overviewMode==='weekly'?'active':''}" onclick="setOverviewMode('weekly')">Weekly</button>
+        <button class="ptoggle-btn ${overviewMode==='monthly'?'active':''}" onclick="setOverviewMode('monthly')">Monthly</button>
+      </div>
       <button class="btn-icon" onclick="shiftWeek(-1)">&#8249;</button>
       <span class="period-label">${weekRange(currentWeekStart)}</span>
       <button class="btn-icon" onclick="shiftWeek(1)">&#8250;</button>
-      <button class="btn-ghost btn-sm" onclick="goThisWeek()">This Week</button>
+      <button class="btn-ghost btn-sm" onclick="goThisWeek()">Now</button>
     </div>
     <div class="deficit-bar">
       <span class="deficit-bar-label">Deficit Target</span>
@@ -1114,78 +1225,28 @@ function renderWeekly(el){
     </div>
     <div class="summary-bar" style="margin-bottom:16px;">
       <div class="summary-item"><div class="summary-label">Avg Weight</div><div class="summary-value">${fmtWeight(stats.avgWeight)}</div></div>
-      ${data.settings.trackCalories!==false?`<div class="summary-item"><div class="summary-label">Avg Cal</div><div class="summary-value">${stats.avgCal?Math.round(stats.avgCal)+' kcal':'—'}</div></div>`:''}
-      ${data.settings.trackMeasurements!==false?`<div class="summary-item"><div class="summary-label">BF%</div><div class="summary-value">${stats.avgBF?fmt(stats.avgBF)+'%':'—'}</div></div>`:''}
-      ${data.settings.trackMeasurements!==false?`<div class="summary-item"><div class="summary-label">Lean Mass</div><div class="summary-value">${fmtWeight(stats.avgLean)}</div></div>`:''}
-      ${data.settings.trackCalories!==false?`<div class="summary-item"><div class="summary-label">Maintenance</div><div class="summary-value">${stats.avgMaint?Math.round(stats.avgMaint)+' kcal':'—'}</div></div>`:''}
+      ${tc?`<div class="summary-item"><div class="summary-label">Avg Cal</div><div class="summary-value">${stats.avgCal?Math.round(stats.avgCal)+' kcal':'—'}</div></div>`:''}
+      ${tm?`<div class="summary-item"><div class="summary-label">BF%</div><div class="summary-value">${stats.avgBF?fmt(stats.avgBF)+'%':'—'}</div></div>`:''}
+      ${tm?`<div class="summary-item"><div class="summary-label">Lean</div><div class="summary-value">${fmtWeight(stats.avgLean)}</div></div>`:''}
+      ${tc?`<div class="summary-item"><div class="summary-label">Maint.</div><div class="summary-value">${stats.avgMaint?Math.round(stats.avgMaint)+' kcal':'—'}</div></div>`:''}
       <div class="summary-item"><div class="summary-label">Avg Steps</div><div class="summary-value">${stats.avgSteps?Math.round(stats.avgSteps):'—'}</div></div>
     </div>
     <div class="card"><div class="table-wrap"><table>
-      <thead><tr><th>Day</th><th>Date</th><th>Weight</th>${data.settings.trackCalories!==false?'<th>Cal</th>':''}${data.settings.trackMeasurements!==false?'<th>Neck</th><th>Waist</th><th>BF%</th>':''}<th>Steps</th><th></th></tr></thead>
+      <thead><tr><th>Day</th><th>Date</th><th>Weight</th>${tc?'<th>Cal</th>':''}${tm?'<th>Neck</th><th>Waist</th><th>BF%</th>':''}<th>Steps</th><th></th></tr></thead>
       <tbody>${days.map(d=>{
         const e=data.days[d]||{};
-        const bf=data.settings.trackMeasurements!==false?calcBF(e.waist,e.neck,data.settings.height):null;
+        const bf=tm?calcBF(e.waist,e.neck,data.settings.height):null;
         return '<tr class="'+(d===today?'today-row':'')+'"><td>'+getDayName(d)+'</td><td>'+fmtShort(d)+'</td>'
           +'<td>'+(e.weight?fmtWeight(e.weight):'—')+'</td>'
-          +(data.settings.trackCalories!==false?'<td>'+(e.calories||'—')+'</td>':'')
-          +(data.settings.trackMeasurements!==false?'<td>'+(e.neck?fmtLen(e.neck):'—')+'</td><td>'+(e.waist?fmtLen(e.waist):'—')+'</td><td>'+(bf?fmt(bf)+'%':'—')+'</td>':'')
+          +(tc?'<td>'+(e.calories||'—')+'</td>':'')
+          +(tm?'<td>'+(e.neck?fmtLen(e.neck):'—')+'</td><td>'+(e.waist?fmtLen(e.waist):'—')+'</td><td>'+(bf?fmt(bf)+'%':'—')+'</td>':'')
           +'<td>'+(e.steps||'—')+'</td>'
           +'<td><button class="btn btn-sm btn-ghost" onclick="openEdit(\''+d+'\')">Edit</button></td></tr>';
       }).join('')}</tbody>
     </table></div></div>`;
 }
-window.shiftWeek=dir=>{currentWeekStart=addDays(currentWeekStart,dir*7);renderView('weekly');};
-window.goThisWeek=()=>{currentWeekStart=getMonday(new Date());renderView('weekly');};
-window.lockWeek=async()=>{
-  const v=parseFloat(document.getElementById('wk-def-inp')?.value);if(isNaN(v)) return;
-  const key=dateStr(currentWeekStart);
-  if(!data.weeks[key]) data.weeks[key]={};
-  data.weeks[key].deficitTarget=v;
-  await saveData();showOk('wk-def-ok');renderView('weekly');
-};
-window.unlockWeek=async()=>{
-  const key=dateStr(currentWeekStart);
-  if(data.weeks[key]) delete data.weeks[key].deficitTarget;
-  await saveData();renderView('weekly');
-};
 
-// ─── EDIT MODAL ────────────────────────────────────────────
-window.openEdit=ds=>{
-  const e=data.days[ds]||{};
-  showModal(`<div class="modal">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-title">Edit — ${fmtFull(ds)}</div>
-    <div class="form-group"><label>Weight (${weightLabel()})</label><input class="input" type="number" step="0.01" id="ed-w" value="${e.weight?fmt(fmtWeightNum(e.weight)):''}"></div>
-    <div class="form-group"><label>Calories</label><input class="input" type="number" id="ed-c" value="${e.calories||''}"></div>
-    <div class="form-group"><label>Steps</label><input class="input" type="number" id="ed-s" value="${e.steps||''}"></div>
-    <div class="form-group"><label>Neck (${lenLabel()})</label><input class="input" type="number" step="0.1" id="ed-n" value="${e.neck?fmt(isMetric()?e.neck:e.neck*0.393701):''}"></div>
-    <div class="form-group"><label>Waist (${lenLabel()})</label><input class="input" type="number" step="0.1" id="ed-wa" value="${e.waist?fmt(isMetric()?e.waist:e.waist*0.393701):''}"></div>
-    <div class="modal-actions">
-      <button class="btn btn-danger btn-sm" onclick="delEntry('${ds}')">Delete</button>
-      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="saveEdit('${ds}')">Save</button>
-    </div>
-  </div>`);
-};
-window.saveEdit=async ds=>{
-  const wRaw=parseFloat(document.getElementById('ed-w')?.value)||null;
-  const w=wRaw?(isMetric()?wRaw:wRaw/2.20462):null;
-  const c=parseFloat(document.getElementById('ed-c')?.value)||null;
-  const s=parseFloat(document.getElementById('ed-s')?.value)||null;
-  const nRaw=parseFloat(document.getElementById('ed-n')?.value)||null;
-  const n=nRaw?(isMetric()?nRaw:nRaw/0.393701):null;
-  const waRaw=parseFloat(document.getElementById('ed-wa')?.value)||null;
-  const wa=waRaw?(isMetric()?waRaw:waRaw/0.393701):null;
-  const entry={};if(w) entry.weight=w;if(c) entry.calories=c;if(s) entry.steps=s;if(n) entry.neck=n;if(wa) entry.waist=wa;
-  data.days[ds]={...(data.days[ds]||{}),...entry};
-  await saveData();closeModal();showToast('Updated!');renderView(currentView);
-};
-window.delEntry=async ds=>{
-  delete data.days[ds];await saveData();closeModal();showToast('Deleted');renderView(currentView);
-};
-
-// ─── MONTHLY ───────────────────────────────────────────────
-function renderMonthly(el){
+function renderOverviewMonthly(el){
   const y=currentMonth.getFullYear(),m=currentMonth.getMonth();
   const allDays=Object.keys(data.days).filter(d=>{const dd=parseDate(d);return dd.getFullYear()===y&&dd.getMonth()===m;});
   const stats=getWeekStats(allDays);
@@ -1193,18 +1254,24 @@ function renderMonthly(el){
   const weeksInMonth=[];
   let mon=getMonday(new Date(y,m,1));const lastDay=new Date(y,m+1,0);
   while(mon<=lastDay){weeksInMonth.push(new Date(mon));mon=addDays(mon,7);}
+  const tm=data.settings.trackMeasurements!==false;
+  const tc=data.settings.trackCalories!==false;
   el.innerHTML=`
-    <div class="page-title">Monthly</div>
-    <div class="period-nav">
+    <div class="page-title">Overview</div>
+    <div class="period-nav" style="margin-bottom:16px;">
+      <div class="period-toggle">
+        <button class="ptoggle-btn ${overviewMode==='weekly'?'active':''}" onclick="setOverviewMode('weekly')">Weekly</button>
+        <button class="ptoggle-btn ${overviewMode==='monthly'?'active':''}" onclick="setOverviewMode('monthly')">Monthly</button>
+      </div>
       <button class="btn-icon" onclick="shiftMonth(-1)">&#8249;</button>
-      <span class="period-label" style="min-width:180px;">${label}</span>
+      <span class="period-label" style="min-width:160px;">${label}</span>
       <button class="btn-icon" onclick="shiftMonth(1)">&#8250;</button>
     </div>
     <div class="summary-bar" style="margin-bottom:16px;">
       <div class="summary-item"><div class="summary-label">Avg Weight</div><div class="summary-value">${fmtWeight(stats.avgWeight)}</div></div>
-      ${data.settings.trackMeasurements!==false?`<div class="summary-item"><div class="summary-label">BF%</div><div class="summary-value">${stats.avgBF?fmt(stats.avgBF)+'%':'—'}</div></div>`:''}
-      ${data.settings.trackCalories!==false?`<div class="summary-item"><div class="summary-label">Avg Cal</div><div class="summary-value">${stats.avgCal?Math.round(stats.avgCal):'—'}</div></div>`:''}
-      ${data.settings.trackCalories!==false?`<div class="summary-item"><div class="summary-label">Maintenance</div><div class="summary-value">${stats.avgMaint?Math.round(stats.avgMaint):'—'}</div></div>`:''}
+      ${tm?`<div class="summary-item"><div class="summary-label">BF%</div><div class="summary-value">${stats.avgBF?fmt(stats.avgBF)+'%':'—'}</div></div>`:''}
+      ${tc?`<div class="summary-item"><div class="summary-label">Avg Cal</div><div class="summary-value">${stats.avgCal?Math.round(stats.avgCal):'—'}</div></div>`:''}
+      ${tc?`<div class="summary-item"><div class="summary-label">Maint.</div><div class="summary-value">${stats.avgMaint?Math.round(stats.avgMaint):'—'}</div></div>`:''}
       <div class="summary-item"><div class="summary-label">Avg Steps</div><div class="summary-value">${stats.avgSteps?Math.round(stats.avgSteps):'—'}</div></div>
     </div>
     ${weeksInMonth.map(mon=>{
@@ -1215,13 +1282,29 @@ function renderMonthly(el){
         +'<span style="font-size:12px;color:var(--text3);">'+weekRange(mon)+' · '+ws.loggedDays+'/7 days</span></div>'
         +'<div class="summary-bar" style="background:var(--bg3);border:none;padding:8px 12px;">'
         +'<div class="summary-item"><div class="summary-label">Avg Wt</div><div class="summary-value">'+fmtWeight(ws.avgWeight)+'</div></div>'
-        +(data.settings.trackMeasurements!==false?'<div class="summary-item"><div class="summary-label">BF%</div><div class="summary-value">'+(ws.avgBF?fmt(ws.avgBF)+'%':'—')+'</div></div>':'')
-        +(data.settings.trackCalories!==false?'<div class="summary-item"><div class="summary-label">Cal</div><div class="summary-value">'+(ws.avgCal?Math.round(ws.avgCal):'—')+'</div></div>':'')
+        +(tm?'<div class="summary-item"><div class="summary-label">BF%</div><div class="summary-value">'+(ws.avgBF?fmt(ws.avgBF)+'%':'—')+'</div></div>':'')
+        +(tc?'<div class="summary-item"><div class="summary-label">Cal</div><div class="summary-value">'+(ws.avgCal?Math.round(ws.avgCal):'—')+'</div></div>':'')
         +'<div class="summary-item"><div class="summary-label">Steps</div><div class="summary-value">'+(ws.avgSteps?Math.round(ws.avgSteps):'—')+'</div></div>'
         +'</div></div>';
     }).join('')}`;
 }
-window.shiftMonth=dir=>{currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()+dir,1);renderView('monthly');};
+
+window.setOverviewMode=m=>{overviewMode=m;renderView('overview');};
+window.shiftWeek=dir=>{currentWeekStart=addDays(currentWeekStart,dir*7);renderView('overview');};
+window.goThisWeek=()=>{currentWeekStart=getMonday(new Date());renderView('overview');};
+window.shiftMonth=dir=>{currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()+dir,1);renderView('overview');};
+window.lockWeek=async()=>{
+  const v=parseFloat(document.getElementById('wk-def-inp')?.value);if(isNaN(v)) return;
+  const key=dateStr(currentWeekStart);
+  if(!data.weeks[key]) data.weeks[key]={};
+  data.weeks[key].deficitTarget=v;
+  await saveData();showOk('wk-def-ok');renderView('overview');
+};
+window.unlockWeek=async()=>{
+  const key=dateStr(currentWeekStart);
+  if(data.weeks[key]) delete data.weeks[key].deficitTarget;
+  await saveData();renderView('overview');
+};
 
 // ─── CHARTS (with 7-day moving average) ────────────────────
 function renderCharts(el){
@@ -1366,63 +1449,194 @@ window.delWeek=async m=>{
   await saveData();showToast('Week deleted');renderView('history');
 };
 
-// ─── NUTRITION (with Open Food Facts) ──────────────────────
-function renderNutrition(el){
+// ─── NUTRITION (MFP-style with flexible meal sections) ──────────
+function getDefaultSections(){return [{id:'breakfast',name:'Breakfast'},{id:'lunch',name:'Lunch'},{id:'dinner',name:'Dinner'},{id:'snacks',name:'Snacks'}];}
+function getMealSections(){return data.settings.mealSections||getDefaultSections();}
+
+window.setNutritionDate=d=>{
   const today=dateStr(new Date());
+  if(d>today) return;
+  nutritionDate=d===today?null:d;
+  renderView('nutrition');
+};
+window.shiftNutritionDate=delta=>{
+  const today=dateStr(new Date());
+  const base=nutritionDate||today;
+  const next=dateStr(addDays(parseDate(base),delta));
+  if(next>today) return;
+  nutritionDate=next===today?null:next;
+  renderView('nutrition');
+};
+
+function renderNutrition(el){
+  const todayStr=dateStr(new Date());
+  const today=nutritionDate||todayStr;
+  const isToday=today===todayStr;
   const n=data.nutrition[today]||{};
   const meals=n.meals||[];
   const calGoal=data.settings.dailyCalGoal||2000;
   const pGoal=data.settings.proteinGoal||150;
   const cGoal=data.settings.carbGoal||200;
   const fGoal=data.settings.fatGoal||65;
-  el.innerHTML=`
-    <div class="page-title">🥗 Nutrition</div>
-    <div class="grid-4" style="margin-bottom:12px;">
-      ${macroCard('Calories',Math.round(n.totalCal||0),calGoal,'kcal','var(--accent)')}
-      ${macroCard('Protein',Math.round(n.protein||0),pGoal,'g','var(--blue)')}
-      ${macroCard('Carbs',Math.round(n.carbs||0),cGoal,'g','var(--green)')}
-      ${macroCard('Fat',Math.round(n.fat||0),fGoal,'g','var(--orange)')}
-    </div>
-    <div class="card" style="margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div class="section-title" style="margin:0;">Meals</div>
-        <div style="display:flex;gap:6px;">
-          <button class="btn btn-secondary btn-sm" onclick="addFromFavoritesModal('${today}')">⭐ Saved</button>
-          <button class="btn btn-primary btn-sm" onclick="addMealModal('${today}')">+ Add Meal</button>
+  const sections=getMealSections();
+  const remaining=calGoal-Math.round(n.totalCal||0);
+  const remColor=remaining<0?'var(--red)':remaining<200?'var(--orange)':'var(--green)';
+
+  // Build section HTML
+  const sectionsHTML=sections.map(sec=>{
+    const secMeals=meals.filter(m=>m.sectionId===sec.id);
+    const secCal=secMeals.reduce((s,m)=>s+(m.cal||0),0);
+    const secProt=secMeals.reduce((s,m)=>s+(m.protein||0),0);
+    const secCarb=secMeals.reduce((s,m)=>s+(m.carbs||0),0);
+    const secFat=secMeals.reduce((s,m)=>s+(m.fat||0),0);
+    return `<div class="mfp-section" style="position:relative;">
+      <div class="mfp-section-header">
+        <div style="display:flex;align-items:center;gap:8px;flex:1;">
+          <span style="font-size:13px;font-weight:700;color:var(--text);">${sec.name}</span>
+          ${secMeals.length?`<span style="font-size:11px;color:var(--text3);">${Math.round(secCal)} kcal</span>`:''}
+        </div>
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-sm btn-ghost" style="padding:4px 6px;font-size:11px;" onclick="renameSectionModal('${sec.id}')">✏️</button>
+          <button class="btn btn-sm btn-ghost" style="padding:4px 6px;font-size:11px;" onclick="deleteSectionConfirm('${sec.id}')">🗑️</button>
         </div>
       </div>
-      ${meals.length===0?'<div style="color:var(--text3);font-size:13px;padding:8px 0;">No meals logged today.</div>':''}
-      ${meals.map((m,i)=>`
-        <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
-          <div style="flex:1;">
-            <div style="font-size:13px;font-weight:600;">${m.name}</div>
-            <div style="font-size:11px;color:var(--text3);">P:${Math.round(m.protein||0)}g C:${Math.round(m.carbs||0)}g F:${Math.round(m.fat||0)}g · ${Math.round(m.cal||0)} kcal</div>
+      ${secMeals.length===0?`<div class="mfp-empty-swipe" data-secid="${sec.id}" data-today="${today}" style="padding:2px 0;">
+        <div style="font-size:12px;color:var(--text3);padding:8px 14px 4px;">No items logged. Swipe right to import yesterday's.</div>
+        <div class="mfp-empty-swipe-reveal">⬆️ Import yesterday's ${sec.name}</div>
+      </div>`:''}
+      ${secMeals.map((m,i)=>{
+        const globalIdx=meals.indexOf(m);
+        return `<div class="mfp-food-row-wrap">
+          <div class="mfp-food-row-reveal">+1</div>
+          <div class="mfp-food-row" data-today="${today}" data-idx="${globalIdx}" data-secid="${sec.id}">
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.name}</div>
+            <div style="font-size:11px;color:var(--text3);">${Math.round(m.cal||0)} kcal &middot; P:${Math.round(m.protein||0)}g C:${Math.round(m.carbs||0)}g F:${Math.round(m.fat||0)}g</div>
           </div>
-          <button class="btn btn-sm btn-ghost" onclick="editMealModal('${today}',${i})" title="Edit">✏️</button>
-          <button class="btn btn-sm btn-ghost" onclick="delMeal('${today}',${i})">✕</button>
-        </div>`).join('')}
-    </div>
-    <div class="card">
-      <div class="section-title">Nutrition Goals</div>
-      <div class="grid-2">
-        <div class="form-group"><label>Daily Cal Goal</label><input class="input" type="number" id="nc-cal" value="${calGoal}"></div>
-        <div class="form-group"><label>Protein Goal (g)</label><input class="input" type="number" id="nc-prot" value="${pGoal}"></div>
-        <div class="form-group"><label>Carbs Goal (g)</label><input class="input" type="number" id="nc-carb" value="${cGoal}"></div>
-        <div class="form-group"><label>Fat Goal (g)</label><input class="input" type="number" id="nc-fat" value="${fGoal}"></div>
-      </div>
-      <button class="btn btn-primary btn-sm" onclick="saveNutritionGoals()">Save Goals</button>
-      <span class="ok-confirm" id="ok-ng">✓</span>
+          <div style="display:flex;gap:2px;flex-shrink:0;">
+            <button class="btn btn-sm btn-ghost" style="padding:4px;" onclick="editMealModal('${today}',${globalIdx})" title="Edit">✏️</button>
+            <button class="btn btn-sm btn-ghost" style="padding:4px;" onclick="delMeal('${today}',${globalIdx})">✕</button>
+          </div>
+        </div></div>`;
+      }).join('')}
+      ${secMeals.length>0?`<div class="mfp-section-totals">
+        <span>Totals</span>
+        <span style="margin-left:auto;">${Math.round(secCal)}</span>
+        <span>${Math.round(secProt)}g</span>
+        <span>${Math.round(secCarb)}g</span>
+        <span>${Math.round(secFat)}g</span>
+      </div>`:''}
+      <button class="mfp-section-fab" onclick="addMealModal('${today}','${sec.id}')" title="Add food to ${sec.name}">+</button>
     </div>`;
+  }).join('');
+
+  el.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+      <div class="page-title" style="margin:0;">🥗 Nutrition</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn btn-secondary btn-sm" onclick="addFromFavoritesModal('${today}')">⭐ Saved</button>
+        <button class="btn btn-secondary btn-sm" onclick="addSectionModal()">+ Section</button>
+        <button class="btn btn-secondary btn-sm" onclick="importFromYesterday('${today}')">⬆️ Yesterday</button>
+        <button class="btn btn-ghost btn-sm" onclick="nutritionGoalsModal()">⚙️ Goals</button>
+      </div>
+    </div>
+
+    <!-- Date navigation -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;">
+      <button class="btn-icon" style="flex-shrink:0;" onclick="shiftNutritionDate(-1)" title="Previous day">‹</button>
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;">
+        <span style="font-size:13px;font-weight:700;font-family:'Syne',sans-serif;">${fmtShort(today)}</span>
+        ${isToday
+          ? '<span style="font-size:10px;background:var(--accent);color:#000;border-radius:100px;padding:2px 7px;font-weight:700;">TODAY</span>'
+          : '<button class="btn btn-primary btn-sm" style="font-size:10px;padding:2px 10px;border-radius:100px;" onclick="setNutritionDate(\''+todayStr+'\')">Today</button>'}
+      </div>
+      <input type="date" id="nutr-date-pick" value="${today}" max="${todayStr}"
+        style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;"
+        onchange="setNutritionDate(this.value)">
+      <button class="btn-icon" style="flex-shrink:0;" onclick="document.getElementById('nutr-date-pick').showPicker?document.getElementById('nutr-date-pick').showPicker():document.getElementById('nutr-date-pick').click()" title="Pick date">📅</button>
+      <button class="btn-icon" style="flex-shrink:0;${isToday?'opacity:0.35;cursor:default;':''}" onclick="shiftNutritionDate(1)" title="Next day">›</button>
+    </div>
+
+    <!-- MFP-style calorie summary bar -->
+    <div class="mfp-cal-bar">
+      <div class="mfp-cal-item">
+        <div class="mfp-cal-label">Goal</div>
+        <div class="mfp-cal-value">${calGoal}</div>
+      </div>
+      <div class="mfp-cal-op">&minus;</div>
+      <div class="mfp-cal-item">
+        <div class="mfp-cal-label">Food</div>
+        <div class="mfp-cal-value">${Math.round(n.totalCal||0)}</div>
+      </div>
+      <div class="mfp-cal-op">=</div>
+      <div class="mfp-cal-item">
+        <div class="mfp-cal-label">Remaining</div>
+        <div class="mfp-cal-value" style="color:${remColor};font-size:22px;">${remaining}</div>
+      </div>
+    </div>
+
+    <!-- Macro progress bars -->
+    <div class="card" style="margin-bottom:12px;">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+        ${mfpMacroBar('Protein',Math.round(n.protein||0),pGoal,'var(--blue)')}
+        ${mfpMacroBar('Carbs',Math.round(n.carbs||0),cGoal,'var(--green)')}
+        ${mfpMacroBar('Fat',Math.round(n.fat||0),fGoal,'var(--orange)')}
+      </div>
+    </div>
+
+    <!-- Meal sections -->
+    <div style="margin-bottom:12px;">
+      ${sectionsHTML}
+    </div>
+
+    <!-- Daily totals footer -->
+    <div class="mfp-daily-totals">
+      <div class="mfp-totals-row">
+        <span style="font-weight:700;">Daily Totals</span>
+        <span style="margin-left:auto;">${Math.round(n.totalCal||0)} kcal</span>
+        <span>${Math.round(n.protein||0)}g P</span>
+        <span>${Math.round(n.carbs||0)}g C</span>
+        <span>${Math.round(n.fat||0)}g F</span>
+      </div>
+      <div class="mfp-totals-row" style="color:var(--text3);">
+        <span>Goal</span>
+        <span style="margin-left:auto;">${calGoal} kcal</span>
+        <span>${pGoal}g</span>
+        <span>${cGoal}g</span>
+        <span>${fGoal}g</span>
+      </div>
+      <div class="mfp-totals-row" style="font-weight:600;">
+        <span>Remaining</span>
+        <span style="margin-left:auto;color:${remColor};">${remaining} kcal</span>
+        <span style="color:${(pGoal-Math.round(n.protein||0))<0?'var(--red)':'inherit'}">${pGoal-Math.round(n.protein||0)}g</span>
+        <span style="color:${(cGoal-Math.round(n.carbs||0))<0?'var(--red)':'inherit'}">${cGoal-Math.round(n.carbs||0)}g</span>
+        <span style="color:${(fGoal-Math.round(n.fat||0))<0?'var(--red)':'inherit'}">${fGoal-Math.round(n.fat||0)}g</span>
+      </div>
+    </div>`;
+  setupNutritionSwipes();
 }
+
+function mfpMacroBar(label,val,goal,color){
+  const pct=goal?Math.min(100,val/goal*100):0;
+  return `<div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+      <span style="font-weight:600;color:var(--text2);">${label}</span>
+      <span style="color:var(--text3);">${val}/${goal}g</span>
+    </div>
+    <div class="progress-bar-wrap" style="margin:0;"><div class="progress-bar-fill" style="width:${pct}%;background:${color};"></div></div>
+  </div>`;
+}
+
 function macroCard(label,val,goal,unit,color){
   const pct=goal?Math.min(100,val/goal*100):0;
-  return `<div class="card">
+  return `<div class="card" style="display:flex;flex-direction:column;">
     <div class="card-title">${label}</div>
-    <div class="card-value" style="font-size:18px;">${val}<span style="font-size:11px;color:var(--text3);"> ${unit}</span></div>
+    <div class="card-value" style="font-size:18px;flex:1;">${val}<span style="font-size:11px;color:var(--text3);"> ${unit}</span></div>
     <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%;background:${color};"></div></div>
     <div style="font-size:10px;color:var(--text3);margin-top:4px;">Goal: ${goal} ${unit}</div>
   </div>`;
 }
+
 function recalcNutritionTotals(today){
   const meals=(data.nutrition[today]?.meals)||[];
   const totals=meals.reduce((acc,m)=>({
@@ -1434,25 +1648,128 @@ function recalcNutritionTotals(today){
   }),{totalCal:0,protein:0,carbs:0,fat:0,fiber:0});
   if(!data.nutrition[today]) data.nutrition[today]={meals:[]};
   Object.assign(data.nutrition[today],totals);
-  // Sync calories to days store
   data.days[today]={...(data.days[today]||{}),calories:Math.round(totals.totalCal)};
 }
 
-window.addMealModal=today=>{
+// Section management
+window.addSectionModal=()=>{
+  document.getElementById('modal-container').innerHTML=`
+    <div class="modal-backdrop" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <div class="modal-title">Add Meal Section</div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div class="form-group"><label>Section Name</label><input class="input" id="sec-name" placeholder="e.g. Pre-Workout, Meal Prep…" autofocus></div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="addSection()">Add</button>
+        </div>
+      </div>
+    </div>`;
+  setTimeout(()=>document.getElementById('sec-name')?.focus(),50);
+};
+window.addSection=async()=>{
+  const name=document.getElementById('sec-name')?.value?.trim();
+  if(!name) return;
+  const sections=getMealSections();
+  sections.push({id:uid(),name});
+  data.settings.mealSections=sections;
+  await saveData();closeModal();renderView('nutrition');
+};
+window.renameSectionModal=id=>{
+  const sec=getMealSections().find(s=>s.id===id);if(!sec) return;
+  document.getElementById('modal-container').innerHTML=`
+    <div class="modal-backdrop" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <div class="modal-title">Rename Section</div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div class="form-group"><label>Name</label><input class="input" id="sec-rename" value="${sec.name}"></div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="renameSection('${id}')">Save</button>
+        </div>
+      </div>
+    </div>`;
+  setTimeout(()=>document.getElementById('sec-rename')?.focus(),50);
+};
+window.renameSection=async id=>{
+  const name=document.getElementById('sec-rename')?.value?.trim();if(!name) return;
+  const sections=getMealSections();
+  const sec=sections.find(s=>s.id===id);if(sec) sec.name=name;
+  data.settings.mealSections=sections;
+  await saveData();closeModal();renderView('nutrition');
+};
+window.deleteSectionConfirm=id=>{
+  const sec=getMealSections().find(s=>s.id===id);if(!sec) return;
+  document.getElementById('modal-container').innerHTML=`
+    <div class="modal-backdrop" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <div class="modal-title">Delete “${sec.name}”?</div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">Food items in this section will move to Uncategorised.</p>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-danger" onclick="deleteSection('${id}')">Delete</button>
+        </div>
+      </div>
+    </div>`;
+};
+window.deleteSection=async id=>{
+  const sections=getMealSections().filter(s=>s.id!==id);
+  data.settings.mealSections=sections;
+  // Reassign meals from deleted section to first remaining section
+  const fallback=sections[0]?.id||'other';
+  Object.keys(data.nutrition).forEach(day=>{
+    (data.nutrition[day]?.meals||[]).forEach(m=>{if(m.sectionId===id) m.sectionId=fallback;});
+  });
+  await saveData();closeModal();renderView('nutrition');showToast('Section deleted');
+};
+
+// Goals modal
+window.nutritionGoalsModal=()=>{
+  const calGoal=data.settings.dailyCalGoal||2000;
+  const pGoal=data.settings.proteinGoal||150;
+  const cGoal=data.settings.carbGoal||200;
+  const fGoal=data.settings.fatGoal||65;
+  document.getElementById('modal-container').innerHTML=`
+    <div class="modal-backdrop" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <div class="modal-title">⚙️ Nutrition Goals</div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div class="grid-2">
+          <div class="form-group"><label>Daily Calories</label><input class="input" type="number" id="nc-cal" value="${calGoal}"></div>
+          <div class="form-group"><label>Protein (g)</label><input class="input" type="number" id="nc-prot" value="${pGoal}"></div>
+          <div class="form-group"><label>Carbs (g)</label><input class="input" type="number" id="nc-carb" value="${cGoal}"></div>
+          <div class="form-group"><label>Fat (g)</label><input class="input" type="number" id="nc-fat" value="${fGoal}"></div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveNutritionGoals()">Save</button>
+        </div>
+      </div>
+    </div>`;
+};
+
+window.addMealModal=(today,sectionId)=>{
+  const sections=getMealSections();
+  const secOpts=sections.map(s=>`<option value="${s.id}" ${s.id===sectionId?'selected':''}>${s.name}</option>`).join('');
   showModal(`<div class="modal" style="max-width:480px;">
     <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-title">Add Meal</div>
+    <div class="modal-title">Add Food</div>
+    <div class="form-group">
+      <label>Section</label>
+      <select class="input" id="ml-section">${secOpts}</select>
+    </div>
     <div class="form-group">
       <label>Search Food (Open Food Facts)</label>
       <div style="display:flex;gap:8px;">
-        <input class="input" id="food-search" placeholder="e.g. chicken breast, oats..." style="flex:1;">
+        <input class="input" id="food-search" placeholder="e.g. chicken breast, oats…" style="flex:1;">
         <button class="btn btn-secondary btn-sm" onclick="searchFood()">Search</button>
       </div>
     </div>
     <div id="food-results" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:12px;display:none;"></div>
     <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px;">
       <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">Or enter manually:</div>
-      <div class="form-group"><label>Meal Name</label><input class="input" id="ml-name" placeholder="e.g. Chicken & Rice"></div>
+      <div class="form-group"><label>Food Name</label><input class="input" id="ml-name" placeholder="e.g. Chicken &amp; Rice"></div>
       <div class="grid-2">
         <div class="form-group"><label>Calories</label><input class="input" type="number" id="ml-cal" placeholder="0"></div>
         <div class="form-group"><label>Protein (g)</label><input class="input" type="number" id="ml-prot" placeholder="0"></div>
@@ -1460,6 +1777,13 @@ window.addMealModal=today=>{
         <div class="form-group"><label>Fat (g)</label><input class="input" type="number" id="ml-fat" placeholder="0"></div>
         <div class="form-group"><label>Fiber (g)</label><input class="input" type="number" id="ml-fiber" placeholder="0"></div>
         <div class="form-group"><label>Quantity (g/ml)</label><input class="input" type="number" id="ml-qty" placeholder="100"></div>
+      </div>
+      <div class="form-group" style="margin-top:4px;">
+        <label style="display:flex;align-items:center;gap:6px;">
+          Count / Servings
+          <span style="font-size:10px;color:var(--text3);font-weight:400;">(multiplies all macros)</span>
+        </label>
+        <input class="input" type="number" id="ml-count" placeholder="1" min="0.25" step="0.25" value="1">
       </div>
     </div>
     <div id="save-to-favs-row" style="display:flex;align-items:center;gap:8px;margin-top:8px;">
@@ -1518,10 +1842,13 @@ window.fillFoodResult=i=>{
 window.editMealModal=(today,idx)=>{
   const m=(data.nutrition[today]?.meals||[])[idx];
   if(!m) return;
+  const sections=getMealSections();
+  const secOpts=sections.map(s=>`<option value="${s.id}" ${s.id===m.sectionId?'selected':''}>${s.name}</option>`).join('');
   showModal(`<div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-title">Edit Meal</div>
-    <div class="form-group"><label>Meal Name</label><input class="input" id="ml-name" value="${m.name||''}"></div>
+    <div class="modal-title">Edit Food</div>
+    <div class="form-group"><label>Section</label><select class="input" id="ml-section">${secOpts}</select></div>
+    <div class="form-group"><label>Food Name</label><input class="input" id="ml-name" value="${m.name||''}"></div>
     <div class="grid-2">
       <div class="form-group"><label>Calories</label><input class="input" type="number" id="ml-cal" value="${m.cal||0}"></div>
       <div class="form-group"><label>Protein (g)</label><input class="input" type="number" id="ml-prot" value="${m.protein||0}"></div>
@@ -1539,6 +1866,7 @@ window.updateMeal=async(today,idx)=>{
   const meals=data.nutrition[today]?.meals||[];
   meals[idx]={
     ...meals[idx],
+    sectionId:document.getElementById('ml-section')?.value||meals[idx].sectionId,
     name:document.getElementById('ml-name')?.value||meals[idx].name,
     cal:parseFloat(document.getElementById('ml-cal')?.value)||0,
     protein:parseFloat(document.getElementById('ml-prot')?.value)||0,
@@ -1547,28 +1875,30 @@ window.updateMeal=async(today,idx)=>{
     fiber:parseFloat(document.getElementById('ml-fiber')?.value)||0
   };
   recalcNutritionTotals(today);
-  await saveData();closeModal();renderView('nutrition');showToast('Meal updated!');
+  await saveData();closeModal();renderView('nutrition');showToast('Updated!');
 };
 window.saveMeal=async today=>{
+  const sectionId=document.getElementById('ml-section')?.value||getMealSections()[0]?.id||'other';
+  const count=Math.max(0.01,parseFloat(document.getElementById('ml-count')?.value)||1);
   const meal={
-    name:document.getElementById('ml-name')?.value||'Meal',
-    cal:parseFloat(document.getElementById('ml-cal')?.value)||0,
-    protein:parseFloat(document.getElementById('ml-prot')?.value)||0,
-    carbs:parseFloat(document.getElementById('ml-carb')?.value)||0,
-    fat:parseFloat(document.getElementById('ml-fat')?.value)||0,
-    fiber:parseFloat(document.getElementById('ml-fiber')?.value)||0
+    sectionId,
+    name:document.getElementById('ml-name')?.value||'Food',
+    cal:Math.round((parseFloat(document.getElementById('ml-cal')?.value)||0)*count*10)/10,
+    protein:Math.round((parseFloat(document.getElementById('ml-prot')?.value)||0)*count*10)/10,
+    carbs:Math.round((parseFloat(document.getElementById('ml-carb')?.value)||0)*count*10)/10,
+    fat:Math.round((parseFloat(document.getElementById('ml-fat')?.value)||0)*count*10)/10,
+    fiber:Math.round((parseFloat(document.getElementById('ml-fiber')?.value)||0)*count*10)/10
   };
   if(!data.nutrition[today]) data.nutrition[today]={meals:[]};
   if(!data.nutrition[today].meals) data.nutrition[today].meals=[];
   data.nutrition[today].meals.push(meal);
   recalcNutritionTotals(today);
-  // Save to favorites if checked
   if(document.getElementById('ml-savefav')?.checked){
     if(!data.settings.savedMeals) data.settings.savedMeals=[];
     data.settings.savedMeals.push({...meal,id:uid()});
   }
   updateStreak();
-  await saveData();closeModal();renderView('nutrition');showToast('Meal added!');
+  await saveData();closeModal();renderView('nutrition');showToast('Food added!');
 };
 window.delMeal=async(today,idx)=>{
   data.nutrition[today].meals.splice(idx,1);
@@ -1578,9 +1908,12 @@ window.delMeal=async(today,idx)=>{
 window.addFromFavoritesModal=today=>{
   const favs=data.settings.savedMeals||[];
   if(!favs.length){showToast('No saved meals yet');return;}
+  const sections=getMealSections();
+  const secOpts=sections.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
   showModal(`<div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
     <div class="modal-title">⭐ Saved Meals</div>
+    <div class="form-group"><label>Add to section</label><select class="input" id="fav-section">${secOpts}</select></div>
     ${favs.map((m,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
       <div style="flex:1;"><div style="font-size:13px;font-weight:600;">${m.name}</div>
       <div style="font-size:11px;color:var(--text3);">${Math.round(m.cal)} kcal · P:${Math.round(m.protein)}g C:${Math.round(m.carbs)}g F:${Math.round(m.fat)}g</div></div>
@@ -1592,7 +1925,8 @@ window.addFromFavoritesModal=today=>{
 window.addFavMeal=async(today,favId)=>{
   const fav=(data.settings.savedMeals||[]).find(m=>m.id===favId);
   if(!fav) return;
-  const meal={...fav};delete meal.id;
+  const sectionId=document.getElementById('fav-section')?.value||getMealSections()[0]?.id||'other';
+  const meal={...fav,sectionId};delete meal.id;
   if(!data.nutrition[today]) data.nutrition[today]={meals:[]};
   if(!data.nutrition[today].meals) data.nutrition[today].meals=[];
   data.nutrition[today].meals.push(meal);
@@ -1609,9 +1943,89 @@ window.saveNutritionGoals=async()=>{
   data.settings.proteinGoal=parseFloat(document.getElementById('nc-prot')?.value)||150;
   data.settings.carbGoal=parseFloat(document.getElementById('nc-carb')?.value)||200;
   data.settings.fatGoal=parseFloat(document.getElementById('nc-fat')?.value)||65;
-  await saveData();showOk('ok-ng');
+  await saveData();closeModal();renderView('nutrition');showToast('Goals saved!');
 };
 
+// Import from yesterday: copies all meals from yesterday → today (optionally filtered by section)
+window.importFromYesterday=async(today,sectionId=null)=>{
+  const yest=dateStr(addDays(parseDate(today),-1));
+  const yMeals=(data.nutrition[yest]?.meals||[]);
+  const toImport=sectionId?yMeals.filter(m=>m.sectionId===sectionId):yMeals;
+  if(!toImport.length){showToast(sectionId?'Nothing in yesterday\'s section':'Nothing logged yesterday');return;}
+  if(!data.nutrition[today]) data.nutrition[today]={meals:[]};
+  if(!data.nutrition[today].meals) data.nutrition[today].meals=[];
+  toImport.forEach(m=>data.nutrition[today].meals.push({...m}));
+  recalcNutritionTotals(today);
+  updateStreak();
+  await saveData();renderView('nutrition');
+  showToast(`Imported ${toImport.length} item${toImport.length>1?'s':''} from yesterday`);
+};
+
+// Set up swipe-right gesture on food rows (swipe right = duplicate/add again)
+// and swipe-right on empty sections (= import that section from yesterday)
+function setupNutritionSwipes(){
+  // Swipe-to-add on food rows
+  document.querySelectorAll('.mfp-food-row').forEach(row=>{
+    let startX=0,startY=0,swiping=false;
+    const wrap=row.closest('.mfp-food-row-wrap');
+    const reveal=wrap?.querySelector('.mfp-food-row-reveal');
+    row.addEventListener('touchstart',e=>{
+      startX=e.touches[0].clientX;startY=e.touches[0].clientY;swiping=false;
+    },{passive:true});
+    row.addEventListener('touchmove',e=>{
+      const dx=e.touches[0].clientX-startX;
+      const dy=e.touches[0].clientY-startY;
+      if(!swiping&&Math.abs(dy)>Math.abs(dx)) return; // vertical scroll
+      swiping=true;
+      if(dx>0&&dx<80){
+        row.style.transition='none';
+        row.style.transform=`translateX(${dx}px)`;
+        if(reveal){reveal.style.opacity=String(dx/64);}
+      }
+    },{passive:true});
+    row.addEventListener('touchend',e=>{
+      const dx=e.changedTouches[0].clientX-startX;
+      row.style.transition='transform 0.2s';
+      row.style.transform='';
+      if(reveal){reveal.style.opacity='0';}
+      if(swiping&&dx>56){
+        const today=row.dataset.today;
+        const idx=parseInt(row.dataset.idx);
+        const secId=row.dataset.secid;
+        const meal=data.nutrition[today]?.meals?.[idx];
+        if(meal){
+          if(!data.nutrition[today].meals) data.nutrition[today].meals=[];
+          data.nutrition[today].meals.push({...meal,sectionId:secId});
+          recalcNutritionTotals(today);
+          saveData();renderView('nutrition');showToast('Added again!');
+        }
+      }
+    });
+  });
+
+  // Swipe-right on empty section areas = import that section from yesterday
+  document.querySelectorAll('.mfp-empty-swipe').forEach(area=>{
+    let startX=0,startY=0,swiping=false;
+    const reveal=area.querySelector('.mfp-empty-swipe-reveal');
+    area.addEventListener('touchstart',e=>{
+      startX=e.touches[0].clientX;startY=e.touches[0].clientY;swiping=false;
+    },{passive:true});
+    area.addEventListener('touchmove',e=>{
+      const dx=e.touches[0].clientX-startX;
+      const dy=e.touches[0].clientY-startY;
+      if(!swiping&&Math.abs(dy)>Math.abs(dx)) return;
+      swiping=true;
+      if(dx>0&&dx<120&&reveal){reveal.style.opacity=String(Math.min(1,dx/80));}
+    },{passive:true});
+    area.addEventListener('touchend',e=>{
+      const dx=e.changedTouches[0].clientX-startX;
+      if(reveal){reveal.style.opacity='0';}
+      if(swiping&&dx>60){
+        importFromYesterday(area.dataset.today,area.dataset.secid);
+      }
+    });
+  });
+}
 // ─── SUPPLEMENTS ───────────────────────────────────────────
 function renderSupplements(el){
   const today=dateStr(new Date());
@@ -1833,16 +2247,44 @@ window.deleteSupp=async id=>{
   await saveData();closeModal();renderView('supplements');
 };
 // ─── MEASUREMENTS ──────────────────────────────────────────
+// Measurement guide descriptions
+const MS_GUIDES = {
+  weight: {label:'Weight',tip:'Measure in the morning, after using the bathroom, before eating. Stand straight on a flat surface.', svg:'<circle cx="50" cy="35" r="18" fill="none" stroke="#f5d800" stroke-width="2"/><line x1="50" y1="53" x2="50" y2="75" stroke="#f5d800" stroke-width="2"/><line x1="35" y1="62" x2="65" y2="62" stroke="#f5d800" stroke-width="2"/><line x1="50" y1="75" x2="38" y2="92" stroke="#f5d800" stroke-width="2"/><line x1="50" y1="75" x2="62" y2="92" stroke="#f5d800" stroke-width="2"/>'},
+  neck:   {label:'Neck',  tip:'Measure just below the larynx (Adam\'s apple), perpendicular to the long axis of the neck. Keep the tape snug but not tight.', svg:'<circle cx="50" cy="28" r="16" fill="none" stroke="#f5d800" stroke-width="2"/><ellipse cx="50" cy="52" rx="22" ry="10" fill="none" stroke="#3b82f6" stroke-width="2.5"/><path d="M28 52 Q50 38 72 52" fill="none" stroke="#3b82f6" stroke-dasharray="3,2" stroke-width="1.5"/>'},
+  waist:  {label:'Waist', tip:'Measure at the narrowest point of your torso, usually 1 inch above the navel. Exhale normally before measuring. Do not suck in.', svg:'<path d="M25 20 Q50 15 75 20 L78 60 Q50 70 22 60 Z" fill="none" stroke="#f5d800" stroke-width="2"/><ellipse cx="50" cy="48" rx="26" ry="8" fill="none" stroke="#3b82f6" stroke-width="2.5"/><path d="M24 48 Q50 40 76 48" fill="none" stroke="#3b82f6" stroke-dasharray="3,2" stroke-width="1.5"/>'},
+  hips:   {label:'Hips',  tip:'Stand with feet together. Measure around the widest part of your hips and buttocks. Keep the tape parallel to the floor.', svg:'<path d="M30 15 Q50 10 70 15 L80 50 Q50 75 20 50 Z" fill="none" stroke="#f5d800" stroke-width="2"/><ellipse cx="50" cy="58" rx="28" ry="9" fill="none" stroke="#3b82f6" stroke-width="2.5"/>'},
+  chest:  {label:'Chest', tip:'Measure around the fullest part of your chest, under the armpits, across the shoulder blades. Keep arms relaxed at your sides.', svg:'<path d="M25 30 Q50 20 75 30 L78 65 Q50 72 22 65 Z" fill="none" stroke="#f5d800" stroke-width="2"/><ellipse cx="50" cy="40" rx="26" ry="8" fill="none" stroke="#3b82f6" stroke-width="2.5"/>'},
+  thighs: {label:'Thighs',tip:'Measure around the widest part of your upper thigh, just below the gluteal fold. Stand with legs slightly apart, weight evenly distributed.', svg:'<path d="M35 10 L45 90" stroke="#f5d800" stroke-width="14" stroke-linecap="round" fill="none"/><ellipse cx="40" cy="38" rx="16" ry="8" fill="none" stroke="#3b82f6" stroke-width="2.5" transform="rotate(-8 40 38)"/>'},
+  biceps: {label:'Biceps',tip:'Measure around the peak of your bicep, midway between the shoulder and elbow. Flex your arm at 90° for the "flexed" measurement, or keep it relaxed for an unflexed measurement.', svg:'<path d="M20 80 Q22 30 50 20 Q78 30 80 80" stroke="#f5d800" stroke-width="12" stroke-linecap="round" fill="none"/><ellipse cx="50" cy="38" rx="20" ry="8" fill="none" stroke="#3b82f6" stroke-width="2.5"/>'}
+};
+
+function measureGuideTooltip(id){
+  const g=MS_GUIDES[id];if(!g) return '';
+  return `<div class="ms-guide-wrap">
+    <button class="ms-guide-btn" onclick="toggleGuide('${id}')" title="How to measure ${g.label}">?</button>
+    <div class="ms-guide-popup" id="guide-${id}">
+      <svg viewBox="0 0 100 100" width="90" height="90" style="display:block;margin:0 auto 8px;">
+        ${g.svg}
+      </svg>
+      <div style="font-size:11px;color:var(--text2);line-height:1.5;">${g.tip}</div>
+    </div>
+  </div>`;
+}
+window.toggleGuide=id=>{
+  document.querySelectorAll('.ms-guide-popup').forEach(p=>{ if(p.id!=='guide-'+id) p.classList.remove('open'); });
+  document.getElementById('guide-'+id)?.classList.toggle('open');
+};
+
 function renderMeasurements(el){
   const today=dateStr(new Date());
   const m=data.measurements[today]||{};
-  const recent=Object.keys(data.measurements).sort().slice(-10).reverse();
+  const allDates=Object.keys(data.measurements).sort().reverse(); // unlimited history
   const fields=[
     {id:'weight',label:`Weight (${weightLabel()})`,step:'0.01',isWeight:true},
-    {id:'neck',label:`Neck (${lenLabel()})`,step:'0.1'},
-    {id:'waist',label:`Waist (${lenLabel()})`,step:'0.1'},
-    {id:'hips',label:`Hips (${lenLabel()})`,step:'0.1'},
-    {id:'chest',label:`Chest (${lenLabel()})`,step:'0.1'},
+    {id:'neck',  label:`Neck (${lenLabel()})`,  step:'0.1'},
+    {id:'waist', label:`Waist (${lenLabel()})`, step:'0.1'},
+    {id:'hips',  label:`Hips (${lenLabel()})`,  step:'0.1'},
+    {id:'chest', label:`Chest (${lenLabel()})`, step:'0.1'},
     {id:'thighs',label:`Thighs (${lenLabel()})`,step:'0.1'},
     {id:'biceps',label:`Biceps (${lenLabel()})`,step:'0.1'}
   ];
@@ -1850,25 +2292,35 @@ function renderMeasurements(el){
     <div class="page-title">📏 Measurements</div>
     <div class="card" style="margin-bottom:12px;">
       <div class="section-title">Today's Measurements</div>
-      <div class="grid-2">
+      <div class="ms-grid">
         ${fields.map(f=>{
           const stored=m[f.id];
           const displayed=stored?(f.isWeight?(isMetric()?fmt(stored):fmt(stored*2.20462)):(isMetric()?fmt(stored):fmt(stored*0.393701))):'';
-          return `<div class="form-group"><label>${f.label}</label><input class="input" type="number" step="${f.step}" id="ms-${f.id}" value="${displayed}" placeholder="—"></div>`;
+          return `<div class="ms-field-wrap">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+              <label style="font-size:12px;font-weight:600;color:var(--text2);">${f.label}</label>
+              ${measureGuideTooltip(f.id)}
+            </div>
+            <input class="input" type="number" step="${f.step}" id="ms-${f.id}" value="${displayed}" placeholder="—">
+          </div>`;
         }).join('')}
       </div>
-      <button class="btn btn-primary btn-sm" onclick="saveMeasurements('${today}')">Save Measurements</button>
+      <button class="btn btn-primary btn-sm" style="margin-top:4px;" onclick="saveMeasurements('${today}')">Save Measurements</button>
       <span class="ok-confirm" id="ok-ms">✓ Saved</span>
     </div>
     <div class="card">
-      <div class="section-title">History (Last 10)</div>
-      ${recent.length===0?'<div style="color:var(--text3);font-size:13px;">No measurement history.</div>':''}
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="section-title" style="margin:0;">History</div>
+        <span style="font-size:11px;color:var(--text3);">${allDates.length} entries</span>
+      </div>
+      ${allDates.length===0?'<div style="color:var(--text3);font-size:13px;">No measurement history.</div>':''}
       <div class="table-wrap"><table>
-        <thead><tr><th>Date</th><th>Weight</th><th>Waist</th><th>Hips</th><th>Chest</th><th>Thighs</th><th>Biceps</th></tr></thead>
-        <tbody>${recent.map(d=>{
+        <thead><tr><th>Date</th><th>Weight</th><th>Neck</th><th>Waist</th><th>Hips</th><th>Chest</th><th>Thighs</th><th>Biceps</th></tr></thead>
+        <tbody>${allDates.map(d=>{
           const ms=data.measurements[d]||{};
           return `<tr><td>${fmtShort(d)}</td>
             <td>${ms.weight?fmtWeight(ms.weight):'—'}</td>
+            <td>${ms.neck?fmtLen(ms.neck):'—'}</td>
             <td>${ms.waist?fmtLen(ms.waist):'—'}</td>
             <td>${ms.hips?fmtLen(ms.hips):'—'}</td>
             <td>${ms.chest?fmtLen(ms.chest):'—'}</td>
@@ -1878,6 +2330,12 @@ function renderMeasurements(el){
         }).join('')}</tbody>
       </table></div>
     </div>`;
+  // Close guides on outside click
+  document.addEventListener('click', function msOutsideClick(e){
+    if(!e.target.closest('.ms-guide-wrap')){
+      document.querySelectorAll('.ms-guide-popup').forEach(p=>p.classList.remove('open'));
+    }
+  },{once:false,capture:false});
 }
 window.saveMeasurements=async today=>{
   const entry={};
@@ -1892,7 +2350,6 @@ window.saveMeasurements=async today=>{
   });
   if(!hasVal){showToast('Nothing entered');return;}
   data.measurements[today]={...(data.measurements[today]||{}),...entry};
-  // Sync weight/neck/waist back to days (single source of truth: days wins if both exist, measurements overrides)
   if(entry.weight) data.days[today]={...(data.days[today]||{}),weight:entry.weight};
   if(entry.neck)   data.days[today]={...(data.days[today]||{}),neck:entry.neck};
   if(entry.waist)  data.days[today]={...(data.days[today]||{}),waist:entry.waist};
@@ -1901,64 +2358,82 @@ window.saveMeasurements=async today=>{
 };
 
 // ─── PROGRESS PHOTOS ───────────────────────────────────────
+let photoFilter = 'all'; // 'all' | '30d' | '90d' | '6m' | '1y'
+
 function renderPhotos(el){
-  const dates=Object.keys(data.photos).sort().reverse();
   const today=dateStr(new Date());
+  const now=new Date();
+  const filterCutoffs={
+    'all':null,
+    '30d':dateStr(addDays(now,-30)),
+    '90d':dateStr(addDays(now,-90)),
+    '6m':dateStr(addDays(now,-180)),
+    '1y':dateStr(addDays(now,-365))
+  };
+  const cutoff=filterCutoffs[photoFilter];
+  const allDates=Object.keys(data.photos).sort().reverse();
+  const filtered=cutoff?allDates.filter(d=>d>=cutoff):allDates;
+
   el.innerHTML=`
     <div class="page-title">📸 Progress Photos</div>
     <div class="card" style="margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div class="section-title" style="margin:0;">Add Photo</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div style="display:flex;gap:4px;flex-wrap:wrap;">
+          ${['all','30d','90d','6m','1y'].map(f=>`<button class="btn btn-sm ${photoFilter===f?'btn-primary':'btn-secondary'}" onclick="setPhotoFilter('${f}')">${f==='all'?'All':f}</button>`).join('')}
+        </div>
         <div style="display:flex;gap:6px;">
-          <input type="file" id="photo-file" accept="image/*" style="display:none;" onchange="handlePhotoUpload('${today}',this)">
-          <button class="btn btn-primary btn-sm" onclick="document.getElementById('photo-file').click()">📷 Take / Upload</button>
+          <input type="date" id="photo-date-pick" class="input" style="width:140px;padding:5px 8px;font-size:12px;" value="${today}">
+          <input type="file" id="photo-file" accept="image/*" style="display:none;" onchange="handlePhotoUpload(this)">
+          <button class="btn btn-primary btn-sm" onclick="document.getElementById('photo-file').click()">📷 Add</button>
         </div>
       </div>
-      <p style="font-size:12px;color:var(--text3);">Photos are stored securely in your account. Link them to a date to track visual progress.</p>
     </div>
-    ${!dates.length?emptyState('📸','No photos yet','Add your first progress photo to start tracking your visual transformation.','Add Photo',"document.getElementById('photo-file').click()"):''}
-    ${dates.map(d=>{
-      const p=data.photos[d];
-      return `<div class="card" style="margin-bottom:12px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <div style="font-weight:600;">${fmtFull(d)}</div>
-          <button class="btn btn-danger btn-sm" onclick="deletePhoto('${d}')">Delete</button>
-        </div>
-        <img src="${p.url}" alt="Progress ${d}" style="width:100%;max-height:400px;object-fit:contain;border-radius:var(--radius-sm);background:var(--bg3);">
-        ${p.notes?`<div style="font-size:12px;color:var(--text3);margin-top:8px;">${p.notes}</div>`:''}
-        <div style="margin-top:8px;">
-          <input class="input" placeholder="Add note…" id="pnote-${d}" value="${p.notes||''}" style="font-size:12px;padding:6px 10px;">
-          <button class="btn btn-secondary btn-sm" style="margin-top:6px;" onclick="savePhotoNote('${d}')">Save Note</button>
-        </div>
-      </div>`;
-    }).join('')}`;
+    ${!filtered.length?emptyState('📸','No photos','Add your first progress photo.','Add Photo',"document.getElementById('photo-file').click()"):''}
+    <div class="photo-compact-grid">
+      ${filtered.map(d=>{
+        const p=data.photos[d];
+        return `<div class="photo-compact-card">
+          <img src="${p.url}" alt="${d}" class="photo-compact-img" onclick="viewPhotoModal('${d}')">
+          <div class="photo-compact-label">${fmtShort(d)}</div>
+          <button class="photo-compact-del" onclick="deletePhoto('${d}')">✕</button>
+        </div>`;
+      }).join('')}
+    </div>`;
 }
-window.handlePhotoUpload=async(today,input)=>{
+window.setPhotoFilter=f=>{photoFilter=f;renderView('photos');};
+window.handlePhotoUpload=async input=>{
   const file=input.files[0];if(!file) return;
+  const targetDate=document.getElementById('photo-date-pick')?.value||dateStr(new Date());
   if(file.size>5*1024*1024){showToast('Image too large (max 5MB)');return;}
   showToast('Processing…');
   const reader=new FileReader();
   reader.onload=async e=>{
-    // Compress: draw on canvas at max 800px
     const img=new Image();
     img.onload=async()=>{
       const canvas=document.createElement('canvas');
-      const maxDim=800;
+      const maxDim=600;
       const ratio=Math.min(maxDim/img.width,maxDim/img.height,1);
       canvas.width=img.width*ratio;canvas.height=img.height*ratio;
       canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
-      const compressed=canvas.toDataURL('image/jpeg',0.7);
-      data.photos[today]={url:compressed,notes:'',addedAt:new Date().toISOString()};
+      const compressed=canvas.toDataURL('image/jpeg',0.75);
+      data.photos[targetDate]={url:compressed,addedAt:new Date().toISOString()};
       updateStreak();
-      await saveData(true);renderView('photos');showToast('Photo saved!');
+      await saveData(true);renderView('photos');showToast('Photo saved for '+fmtShort(targetDate));
     };
     img.src=e.target.result;
   };
   reader.readAsDataURL(file);
 };
-window.savePhotoNote=async d=>{
-  if(data.photos[d]) data.photos[d].notes=document.getElementById('pnote-'+d)?.value||'';
-  await saveData();showToast('Note saved');
+window.viewPhotoModal=d=>{
+  const p=data.photos[d];if(!p) return;
+  showModal(`<div class="modal" style="max-width:500px;padding:16px;">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div style="font-size:14px;font-weight:700;margin-bottom:12px;">${fmtFull(d)}</div>
+    <img src="${p.url}" style="width:100%;border-radius:var(--radius-sm);object-fit:contain;max-height:70vh;">
+    <div style="margin-top:12px;display:flex;justify-content:flex-end;">
+      <button class="btn btn-danger btn-sm" onclick="deletePhoto('${d}');closeModal()">Delete</button>
+    </div>
+  </div>`);
 };
 window.deletePhoto=async d=>{
   if(!confirm('Delete this photo?')) return;
@@ -1966,117 +2441,6 @@ window.deletePhoto=async d=>{
   await saveData(true);renderView('photos');showToast('Photo deleted');
 };
 
-// ─── CYCLE ─────────────────────────────────────────────────
-function renderCycle(el){
-  const today=dateStr(new Date());
-  const c=data.cycle;
-  const cycleLen=c.cycleLength||28;
-  const periodLen=c.periodLength||5;
-  const start=addDays(new Date(),-17);
-  const days35=Array.from({length:35},(_,i)=>dateStr(addDays(start,i)));
-
-  function predictPhase(d){
-    if(!c.periodStart) return null;
-    const diff=Math.round((parseDate(d)-parseDate(c.periodStart))/86400000);
-    const dayInCycle=((diff%cycleLen)+cycleLen)%cycleLen;
-    if(dayInCycle<periodLen) return 'period';
-    const ovDay=Math.round(cycleLen/2);
-    // Check ovulation BEFORE fertile window so it can be returned
-    if(dayInCycle===ovDay) return 'ovulation';
-    if(dayInCycle>=ovDay-3&&dayInCycle<=ovDay+1) return 'fertile';
-    if(dayInCycle>=cycleLen-5) return 'pms';
-    return 'luteal';
-  }
-
-  const phase=predictPhase(today);
-  const phaseLabels={period:'🩸 Period',fertile:'🌿 Fertile Window',ovulation:'🥚 Ovulation',pms:'😔 PMS',luteal:'🌙 Luteal Phase'};
-
-  el.innerHTML=`
-    <div class="page-title">🌸 Cycle Tracking</div>
-    ${phase?`<div class="card" style="margin-bottom:12px;background:var(--bg3);">
-      <div style="font-size:13px;color:var(--text2);">Current Phase</div>
-      <div style="font-size:20px;font-weight:700;margin-top:4px;">${phaseLabels[phase]||phase}</div>
-    </div>`:''}
-    <div class="card" style="margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div class="section-title" style="margin:0;">Calendar</div>
-        <button class="btn btn-primary btn-sm" onclick="logPeriodModal()">Log Period</button>
-      </div>
-      <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
-        <span style="font-size:11px;color:var(--pink);">🩸 Period</span>
-        <span style="font-size:11px;color:var(--green);">🌿 Fertile</span>
-        <span style="font-size:11px;color:var(--purple);">🥚 Ovulation</span>
-        <span style="font-size:11px;color:var(--orange);">😔 PMS</span>
-      </div>
-      <div class="cycle-grid">
-        ${days35.map(d=>{
-          const ph=(c.log[d]?.phase)||predictPhase(d);
-          return `<div class="cycle-day ${ph||''} ${d===today?'today-ring':''}" title="${fmtShort(d)}: ${phaseLabels[ph]||ph||''}">
-            ${parseDate(d).getDate()}
-          </div>`;
-        }).join('')}
-      </div>
-    </div>
-    <div class="card" style="margin-bottom:12px;">
-      <div class="section-title">Log Today's Symptoms</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
-        ${['Cramps','Bloating','Headache','Fatigue','Mood swings','Acne','Breast tenderness','Spotting'].map(s=>{
-          const logged=(c.log[today]?.symptoms||[]).includes(s);
-          return `<button class="symptom-chip" style="${logged?'background:var(--accent);color:#000;border-color:var(--accent);':''}" onclick="toggleSymptom('${s}','${today}')">${s}</button>`;
-        }).join('')}
-      </div>
-      <div class="form-group"><label>Mood</label>
-        <select class="input" id="cyc-mood" onchange="saveCycleMood('${today}')">
-          <option value="">Select mood…</option>
-          ${['😊 Happy','😐 Neutral','😔 Low','😤 Irritable','😢 Emotional','😴 Tired'].map(m=>`<option value="${m}" ${c.log[today]?.mood===m?'selected':''}>${m}</option>`).join('')}
-        </select>
-      </div>
-    </div>
-    <div class="card">
-      <div class="section-title">Cycle Settings</div>
-      <div class="grid-2">
-        <div class="form-group"><label>Cycle Length (days)</label><input class="input" type="number" id="cyc-len" value="${cycleLen}" min="21" max="40"></div>
-        <div class="form-group"><label>Period Length (days)</label><input class="input" type="number" id="cyc-plen" value="${periodLen}" min="2" max="10"></div>
-      </div>
-      <div class="form-group"><label>Last Period Start</label><input class="input" type="date" id="cyc-start" value="${c.periodStart||''}"></div>
-      <button class="btn btn-primary btn-sm" onclick="saveCycleSettings()">Save</button>
-      <span class="ok-confirm" id="ok-cyc">✓</span>
-    </div>`;
-}
-window.logPeriodModal=()=>{
-  showModal(`<div class="modal">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-title">Log Period Start</div>
-    <div class="form-group"><label>Period Start Date</label><input class="input" type="date" id="per-start" value="${dateStr(new Date())}"></div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="savePeriodStart()">Log</button>
-    </div>
-  </div>`);
-};
-window.savePeriodStart=async()=>{
-  data.cycle.periodStart=document.getElementById('per-start')?.value;
-  await saveData();closeModal();renderView('cycle');
-};
-window.toggleSymptom=async(s,today)=>{
-  if(!data.cycle.log[today]) data.cycle.log[today]={symptoms:[]};
-  if(!data.cycle.log[today].symptoms) data.cycle.log[today].symptoms=[];
-  const idx=data.cycle.log[today].symptoms.indexOf(s);
-  if(idx>=0) data.cycle.log[today].symptoms.splice(idx,1);
-  else data.cycle.log[today].symptoms.push(s);
-  updateStreak();await saveData();renderView('cycle');
-};
-window.saveCycleMood=async today=>{
-  if(!data.cycle.log[today]) data.cycle.log[today]={symptoms:[]};
-  data.cycle.log[today].mood=document.getElementById('cyc-mood')?.value;
-  await saveData();
-};
-window.saveCycleSettings=async()=>{
-  data.cycle.cycleLength=parseInt(document.getElementById('cyc-len')?.value)||28;
-  data.cycle.periodLength=parseInt(document.getElementById('cyc-plen')?.value)||5;
-  data.cycle.periodStart=document.getElementById('cyc-start')?.value||null;
-  await saveData();showOk('ok-cyc');renderView('cycle');
-};
 // ─── INSIGHTS ──────────────────────────────────────────────
 function renderInsights(el){
   const last7=Array.from({length:7},(_,i)=>dateStr(addDays(new Date(),-6+i)));
@@ -2377,7 +2741,6 @@ function renderSettings(el){
         ${trackToggle('trackCalories','Calorie & Nutrition Tracking','Log meals and macros')}
         ${trackToggle('trackSupplements','Supplement Tracking','Daily stack adherence')}
         ${trackToggle('trackMeasurements','Body Measurements','Full body measurement log')}
-        ${data.settings.gender!=='male'?trackToggle('trackCycle','Cycle Tracking','Menstrual cycle & symptoms'):''}
       </div>
     </div>
 
@@ -2459,6 +2822,12 @@ function trackToggle(key,label,sub){
     <label class="toggle-switch"><input type="checkbox" ${isOn?'checked':''} onchange="toggleTrackFeature('${key}',this)"><span class="toggle-slider"></span></label>
   </div>`;
 }
+window.toggleTrackFeature=async(key,el)=>{
+  data.settings[key]=el.checked;
+  await saveData();
+  updateNavVisibility();
+  renderView('settings');
+};
 window.selectPlan=plan=>{data.settings.plan=plan;renderView('settings');};
 window.subscribeMock=async()=>{
   showModal(`<div class="modal">
@@ -2511,7 +2880,7 @@ window.confirmShift=()=>{
   showModal(`<div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
     <div class="modal-title">Confirm Date Shift</div>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">This will shift ALL entries (days, nutrition, measurements, supplements, cycle) by <strong>${n}</strong> day${Math.abs(n)!==1?'s':''}. This cannot be undone.</p>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">This will shift ALL entries (days, nutrition, measurements, supplements) by <strong>${n}</strong> day${Math.abs(n)!==1?'s':''}. This cannot be undone.</p>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
       <button class="btn btn-danger" onclick="applyShift()">Apply Shift</button>
@@ -2526,7 +2895,6 @@ window.applyShift=async()=>{
   data.nutrition=shift(data.nutrition);
   data.measurements=shift(data.measurements);
   data.supplements.log=shift(data.supplements.log);
-  data.cycle.log=shift(data.cycle.log);
   data.photos=shift(data.photos);
   await saveData(true);closeModal();showToast('Shifted all entries');renderView('settings');
 };
@@ -2541,13 +2909,13 @@ window.toggleTheme=()=>{
 window.confirmClear=()=>{
   showModal('<div class="modal"><button class="modal-close" onclick="closeModal()">✕</button>'
     +'<div class="modal-title">Clear All Data?</div>'
-    +'<p style="font-size:13px;color:var(--text2);margin-bottom:16px;">Deletes all logged days, weeks, nutrition, supplements, measurements, photos and cycle logs. Settings are preserved. Cannot be undone.</p>'
+    +'<p style="font-size:13px;color:var(--text2);margin-bottom:16px;">Deletes all logged days, weeks, nutrition, supplements, measurements, and photos. Settings are preserved. Cannot be undone.</p>'
     +'<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button>'
     +'<button class="btn btn-danger" onclick="doClear()">Clear All</button></div></div>');
 };
 window.doClear=async()=>{
   data.days={};data.weeks={};data.nutrition={};data.measurements={};
-  data.supplements.log={};data.cycle.log={};data.photos={};
+  data.supplements.log={};data.photos={};
   await saveData(true);closeModal();showToast('All data cleared');renderView('dashboard');
 };
 // ─── EXCEL ─────────────────────────────────────────────────
@@ -2570,8 +2938,7 @@ window.importXlsx=inp=>{
         calories: data.settings.trackCalories!==false,
         supplements: data.settings.trackSupplements!==false,
         measurements: data.settings.trackMeasurements!==false,
-        cycle:    data.settings.gender!=='male'&&data.settings.trackCycle!==false,
-      };
+          };
 
       // Column normaliser: find first header key that includes any of the search strings
       const makeGet=headers=>{
