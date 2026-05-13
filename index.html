@@ -394,8 +394,15 @@ tr:hover td{background:var(--bg3);}
 </div>
 <div id="stats-panel-backdrop" style="display:none;position:fixed;inset:0;z-index:139;" onclick="closeStatsPanel()"></div>
 
+<!-- SPLASH (shown while Firebase resolves auth state) -->
+<div id="splash-screen" style="position:fixed;inset:0;background:var(--bg);z-index:1100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:3px;color:var(--accent);">Peak Physiq</div>
+  <div style="width:32px;height:32px;border:3px solid var(--bg4);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;"></div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg);}}</style>
+
 <!-- AUTH -->
-<div id="auth-screen">
+<div id="auth-screen" style="display:none;">
   <div class="auth-logo">Peak Physiq</div>
   <p class="auth-sub">Lift. Track. Evolve.</p>
   <div class="trial-badge">✓ 14-day free trial · No credit card needed</div>
@@ -669,16 +676,25 @@ window.handleSignIn=(provider,btn)=>{
 window.doSignOut=async()=>{
   document.getElementById('top-bar').style.display='none';
   closeStatsPanel();
-  if(currentUser&&currentUser.uid!=='guest') await fbSignOut(auth);
-  else{currentUser=null;document.getElementById('auth-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('onboard-screen').style.display='none';}
+  if(currentUser&&currentUser.uid!=='guest'){
+    await fbSignOut(auth);
+    // onAuthStateChanged will fire with null and show auth screen
+  } else {
+    currentUser=null;
+    document.getElementById('app').style.display='none';
+    document.getElementById('onboard-screen').style.display='none';
+    document.getElementById('splash-screen').style.display='none';
+    document.getElementById('auth-screen').style.display='flex';
+  }
 };
 
 window.handleGuestContinue=()=>{
+  document.getElementById('splash-screen').style.display='none';
   const gu={uid:'guest',displayName:'',email:'',photoURL:null,isGuest:true};
   currentUser=gu;
   loadData().then(()=>{
     initTrial();
-    if(!data.settings.dob&&!data.settings.name) showOnboarding(gu);
+    if(!data.settings.onboardingComplete) showOnboarding(gu);
     else{showApp(gu);navigate('dashboard');}
   });
 };
@@ -688,12 +704,15 @@ document.getElementById('guest-continue-btn').addEventListener('click',()=>windo
 
 onAuthStateChanged(auth,async user=>{
   if(user){
+    currentUser=user;
     await loadData();
     initTrial();
-    if(!data.settings.dob&&!data.settings.name) showOnboarding(user);
+    document.getElementById('splash-screen').style.display='none';
+    if(!data.settings.onboardingComplete) showOnboarding(user);
     else{showApp(user);navigate('dashboard');}
   } else {
     currentUser=null;
+    document.getElementById('splash-screen').style.display='none';
     document.getElementById('auth-screen').style.display='flex';
     document.getElementById('app').style.display='none';
     document.getElementById('onboard-screen').style.display='none';
@@ -806,6 +825,7 @@ window.obNext=step=>{
   renderOnboarding(step+1);
 };
 window.obFinish=async()=>{
+  data.settings.onboardingComplete=true;
   data.settings.trialStart=dateStr(new Date());
   data.settings.streakDays=1;
   data.settings.lastLogDate=dateStr(new Date());
@@ -817,6 +837,7 @@ window.obFinish=async()=>{
 window.obSkip=async()=>{
   // Save minimal defaults so we don't re-trigger onboarding
   if(!data.settings.name) data.settings.name=currentUser?.displayName||'Athlete';
+  data.settings.onboardingComplete=true;
   data.settings.trialStart=dateStr(new Date());
   data.settings.streakDays=1;
   data.settings.lastLogDate=dateStr(new Date());
@@ -882,6 +903,10 @@ function mergeData(d){
   if(!data.settings.savedMeals) data.settings.savedMeals=[];
   if(!data.supplements.list) data.supplements.list=[];
   if(!data.supplements.log) data.supplements.log={};
+  // Migration: existing users who completed onboarding before the flag existed
+  if(!data.settings.onboardingComplete&&(data.settings.name||data.settings.dob||data.settings.trialStart)){
+    data.settings.onboardingComplete=true;
+  }
 }
 
 // Debounced save — prevents hammering Firestore on rapid toggles
